@@ -119,19 +119,25 @@
                                     <div class="col-4">
                                         <div class="p-2 form-control-glass border-0" style="border-radius: 8px;">
                                             <div class="text-muted small" style="font-size: 0.72rem;">Temp</div>
-                                            <div class="fw-bold text-danger">{{ $device->latest_log->temperature }}°C</div>
+                                            <div class="fw-bold text-danger">
+                                                {{ !is_null($device->latest_log->temperature) ? $device->latest_log->temperature . '°C' : '--' }}
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="p-2 form-control-glass border-0" style="border-radius: 8px;">
                                             <div class="text-muted small" style="font-size: 0.72rem;">Humidity</div>
-                                            <div class="fw-bold text-primary">{{ $device->latest_log->humidity }}%</div>
+                                            <div class="fw-bold text-primary">
+                                                {{ !is_null($device->latest_log->humidity) ? $device->latest_log->humidity . '%' : '--' }}
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="p-2 form-control-glass border-0" style="border-radius: 8px;">
                                             <div class="text-muted small" style="font-size: 0.72rem;">Pressure</div>
-                                            <div class="fw-bold text-info" style="font-size: 0.9rem; padding: 1.5px 0;">{{ $device->latest_log->pressure }}</div>
+                                            <div class="fw-bold text-info" style="font-size: 0.88rem; padding: 1.5px 0;">
+                                                {{ !is_null($device->latest_log->pressure) ? round($device->latest_log->pressure) . ' hPa' : '--' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -174,6 +180,37 @@
                                     </div>
                                     <div class="progress-bar-custom">
                                         <div class="progress-fill" style="width: {{ $rssiPct }}%; background: {{ $rssiColor }};"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Component Diagnostic Panel -->
+                                <div class="border-top pt-3 mt-3">
+                                    <span class="text-secondary small fw-semibold uppercase tracking-wider d-block mb-2" style="font-size: 0.75rem;">Component Statuses</span>
+                                    <div class="row g-2">
+                                        <!-- BME280 Status -->
+                                        <div class="col-6">
+                                            <div class="p-2 form-control-glass d-flex align-items-center justify-content-between border-0" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05);">
+                                                <span class="text-secondary small" style="font-size: 0.68rem; font-weight: 500;">BME280 Sensor</span>
+                                                @if($device->latest_log->bme_status)
+                                                    <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;">OK</span>
+                                                @else
+                                                    <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <!-- Charger State (TP4056 + Solar) -->
+                                        <div class="col-6">
+                                            <div class="p-2 form-control-glass d-flex align-items-center justify-content-between border-0" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05);">
+                                                <span class="text-secondary small" style="font-size: 0.68rem; font-weight: 500;">Solar Charger</span>
+                                                @if($device->latest_log->solar_status === 'charging')
+                                                    <span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.55rem;"></i>CHARGING</span>
+                                                @elseif($device->latest_log->solar_status === 'full')
+                                                    <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.55rem;"></i>FULL</span>
+                                                @else
+                                                    <span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.55rem;"></i>IDLE</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             @else

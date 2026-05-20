@@ -1,20 +1,42 @@
 /**
- * SOLAR-POWERED ESP8266 + BME280 WEATHER STATION FIRMWARE
- * WITH CAPTIVE PORTAL WIFI AUTO-CONFIGURATION
+ * ==========================================================================
+ * SOLAR-POWERED ESP8266 + BME280 + TP4056 WEATHER STATION FIRMWARE
+ * WITH REAL-TIME COMPONENT DIAGNOSTICS & CAPTIVE PORTAL CONFIGURATION
+ * ==========================================================================
  * 
- * Hardware Wiring:
- * - BME280 I2C connection:
- *     VCC  -> 3.3V
- *     GND  -> GND
- *     SCL  -> D1 (GPIO 5)
- *     SDA  -> D2 (GPIO 4)
- * - Battery Monitoring (Analog Pin A0):
- *     To measure a 18650 Li-Ion battery (3.0V - 4.2V) safely on the A0 pin:
- *     Wiring: Battery (+) -> [ 220k Ohm Resistor ] -> A0 -> [ 100k Ohm Resistor ] -> GND
- *     This scales 4.2V down to ~1.31V, which fits NodeMCU's board divider perfectly.
- * - Deep Sleep Support:
- *     GPIO16 (D0) must be physically connected to the RST pin.
- *     Warning: Disconnect this jumper wire during firmware flashing/uploading!
+ * 🛠️ DETAILED SOLDERING & WIRING CONNECTION SCHEMATIC
+ * --------------------------------------------------------------------------
+ * 
+ * 1. BME280 Sensor (I2C)
+ *    [BME280 Pin]      --->  [NodeMCU Pin]   --->  [Description]
+ *    VCC               --->  3V3             --->  Power Supply (3.3V)
+ *    GND               --->  GND             --->  System Ground
+ *    SCL               --->  D1 (GPIO 5)     --->  I2C Clock Line
+ *    SDA               --->  D2 (GPIO 4)     --->  I2C Data Line
+ * 
+ * 2. TP4056 Solar Charger Module
+ *    [TP4056 Pin]      --->  [Connection]    --->  [Description]
+ *    IN+               --->  Solar Panel (+) --->  Positive Input from 3W Solar Panel
+ *    IN-               --->  Solar Panel (-) --->  Negative Input from 3W Solar Panel
+ *    BAT+              --->  18650 Battery(+)--->  Positive Battery terminal (3.0V - 4.2V)
+ *    BAT-              --->  18650 Battery(-)--->  Negative Battery terminal
+ *    OUT+              --->  NodeMCU VIN     --->  System Power Supply (Filtered)
+ *    OUT-              --->  NodeMCU GND     --->  System Common Ground
+ *    CHRG (Pin 7 LED)  --->  NodeMCU D5      --->  Low when actively Charging (GPIO 14)
+ *    STDBY (Pin 6 LED) --->  NodeMCU D6      --->  Low when battery is fully Charged (GPIO 12)
+ * 
+ * 3. 18650 Battery Monitoring Divider Circuit (A0 Pin)
+ *    To read high battery voltages (3.0V - 4.2V) on the analog input safely:
+ *    [Battery Positive (+)] -> [ 220k Ohm Resistor ] -> A0 -> [ 100k Ohm Resistor ] -> [Common GND (-)]
+ *    - This scales a max battery voltage of 4.2V down to ~1.31V.
+ *    - The NodeMCU board has an internal 220k/100k divider, mapping this to the raw ESP8266 ADC.
+ * 
+ * 4. Deep Sleep Hardware Wakeup Jumper
+ *    [NodeMCU Pin]      --->  [NodeMCU Pin]   --->  [Description]
+ *    D0 (GPIO 16)      --->  RST             --->  Physically jumpered to wake up ESP8266
+ *    ⚠️ WARNING: Disconnect this jumper wire while flashing/uploading code via USB!
+ * 
+ * ==========================================================================
  */
 
 #include <ESP8266WiFi.h>
@@ -44,36 +66,71 @@ const uint64_t SLEEP_DURATION_US = 5 * 60 * 1000000ULL;
 // Captive Portal Hotspot configuration
 const char* PORTAL_AP_SSID = "Solar_Weather_Setup"; // Open SSID name
 const int PORTAL_TIMEOUT_SEC = 180; // 3-minute timeout to prevent battery drain
+
+// TP4056 Charger Digital Monitoring Pins
+const int PIN_TP4056_CHRG  = 14; // D5 on NodeMCU (GPIO 14)
+const int PIN_TP4056_STDBY = 12; // D6 on NodeMCU (GPIO 12)
 // ======================================================
 
 Adafruit_BME280 bme; // I2C Mode
+bool bmeConnected = false;
 
 void setup() {
   Serial.begin(115200);
   delay(10);
   Serial.println("\n--- Solar Weather Station Waking Up ---");
 
-  // 1. Initialize BME280 Sensor
-  if (!bme.begin(0x76)) { // Alternate address is 0x77
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  // 1. Initialize TP4056 Charger Pins as digital inputs with pullup resistors
+  pinMode(PIN_TP4056_CHRG, INPUT_PULLUP);
+  pinMode(PIN_TP4056_STDBY, INPUT_PULLUP);
+
+  // 2. Initialize BME280 Sensor
+  if (bme.begin(0x76)) { // Alternate address is 0x77
+    bmeConnected = true;
+    Serial.println("BME280 Environmental Sensor successfully initialized!");
+  } else {
+    Serial.println("WARNING: Could not find a valid BME280 sensor, check soldering!");
     // We will still proceed to transmit battery status even if sensor fails
   }
 
-  // 2. Read Sensors immediately (minimize active power draw before radio starts)
-  float temperature = bme.readTemperature();
-  float humidity    = bme.readHumidity();
-  float pressure    = bme.readPressure() / 100.0F; // Convert Pa to hPa
+  // 3. Read Sensors immediately (minimize active power draw before radio starts)
+  float temperature = NAN;
+  float humidity    = NAN;
+  float pressure    = NAN;
+
+  if (bmeConnected) {
+    temperature = bme.readTemperature();
+    humidity    = bme.readHumidity();
+    pressure    = bme.readPressure() / 100.0F; // Convert Pa to hPa
+  }
 
   // Read Battery Voltage (A0 Pin)
   int rawADC = analogRead(A0);
-  float batteryVoltage = (rawADC / 1023.0) * 4.2; // Typical resistor calibration factor
+  float batteryVoltage = (rawADC / 1023.0) * 4.2; // Calibrated divider voltage factor
   
-  Serial.print("Sensor Temp: "); Serial.print(temperature); Serial.println(" C");
-  Serial.print("Sensor Hum:  "); Serial.print(humidity); Serial.println(" %");
-  Serial.print("Sensor Pres: "); Serial.print(pressure); Serial.println(" hPa");
-  Serial.print("Battery V:   "); Serial.print(batteryVoltage); Serial.println(" V");
+  // Read TP4056 charging module outputs
+  bool isCharging = (digitalRead(PIN_TP4056_CHRG) == LOW);
+  bool isFull     = (digitalRead(PIN_TP4056_STDBY) == LOW);
+  
+  String solarStatus = "idle";
+  if (isCharging) {
+    solarStatus = "charging";
+  } else if (isFull) {
+    solarStatus = "full";
+  }
 
-  // 3. Initialize WiFi Captive Portal Manager
+  Serial.println("\n--- Diagnostic Telemetry Snapshot ---");
+  if (bmeConnected) {
+    Serial.print("Temp:      "); Serial.print(temperature); Serial.println(" C");
+    Serial.print("Hum:       "); Serial.print(humidity); Serial.println(" %");
+    Serial.print("Pres:      "); Serial.print(pressure); Serial.println(" hPa");
+  } else {
+    Serial.println("Temp/Hum/Pres: [SENSOR OFFLINE]");
+  }
+  Serial.print("Battery V: "); Serial.print(batteryVoltage); Serial.println(" V");
+  Serial.print("Solar Chg: "); Serial.println(solarStatus);
+
+  // 4. Initialize WiFi Captive Portal Manager
   WiFiManager wifiManager;
 
   // Design Customizations for Config Portal Webpage
@@ -96,28 +153,32 @@ void setup() {
   long rssi = WiFi.RSSI();
   Serial.print("RSSI Signal Strength: "); Serial.print(rssi); Serial.println(" dBm");
 
-  // 4. Construct JSON Payload
-  StaticJsonDocument<256> doc;
-  doc["api_key"]     = API_KEY;
-  doc["device_id"]   = DEVICE_ID;
+  // 5. Construct JSON Payload
+  StaticJsonDocument<384> doc;
+  doc["api_key"]      = API_KEY;
+  doc["device_id"]    = DEVICE_ID;
   
-  if (isnan(temperature)) doc["temperature"] = 0.0;
-  else doc["temperature"] = round(temperature * 10) / 10.0; // 1 decimal place
+  if (bmeConnected && !isnan(temperature) && !isnan(humidity) && !isnan(pressure)) {
+    doc["temperature"] = round(temperature * 10) / 10.0; // 1 decimal place
+    doc["humidity"]    = round(humidity * 10) / 10.0;
+    doc["pressure"]    = round(pressure * 10) / 10.0;
+    doc["bme_status"]  = true;
+  } else {
+    doc["temperature"] = nullptr;
+    doc["humidity"]    = nullptr;
+    doc["pressure"]    = nullptr;
+    doc["bme_status"]  = false;
+  }
   
-  if (isnan(humidity)) doc["humidity"] = 0.0;
-  else doc["humidity"] = round(humidity * 10) / 10.0;
-  
-  if (isnan(pressure)) doc["pressure"] = 0.0;
-  else doc["pressure"] = round(pressure * 10) / 10.0;
-  
-  doc["battery"]     = round(batteryVoltage * 100) / 100.0; // 2 decimal places
-  doc["rssi"]        = rssi;
+  doc["battery"]      = round(batteryVoltage * 100) / 100.0; // 2 decimal places
+  doc["rssi"]         = rssi;
+  doc["solar_status"] = solarStatus;
 
   String jsonPayload;
   serializeJson(doc, jsonPayload);
   Serial.print("JSON Payload: "); Serial.println(jsonPayload);
 
-  // 5. Send HTTP POST to Laravel Platform
+  // 6. Send HTTP POST to Laravel Platform
   WiFiClientSecure client;
   client.setInsecure(); // Secure SSL connections without certificate strict checking
   
@@ -155,7 +216,7 @@ void setup() {
     }
   }
 
-  // 6. Enter Deep Sleep
+  // 7. Enter Deep Sleep
   enterDeepSleep();
 }
 

@@ -21,11 +21,13 @@ class ApiController extends Controller
         $validator = Validator::make($request->all(), [
             'api_key' => 'required|string',
             'device_id' => 'required|string',
-            'temperature' => 'required|numeric|between:-50,60',
-            'humidity' => 'required|numeric|between:0,100',
-            'pressure' => 'required|numeric|between:800,1200',
+            'temperature' => 'nullable|numeric|between:-50,60',
+            'humidity' => 'nullable|numeric|between:0,100',
+            'pressure' => 'nullable|numeric|between:800,1200',
             'battery' => 'nullable|numeric|between:0,6',
             'rssi' => 'nullable|integer|between:-150,0',
+            'bme_status' => 'nullable|boolean',
+            'solar_status' => 'nullable|string|in:idle,charging,full',
         ]);
 
         if ($validator->fails()) {
@@ -62,14 +64,16 @@ class ApiController extends Controller
             ], 403);
         }
 
-        // 3. Log the weather data
+        // 3. Log the weather data (handling optional sensors gracefully)
         WeatherLog::create([
             'device_id' => $validated['device_id'],
-            'temperature' => $validated['temperature'],
-            'humidity' => $validated['humidity'],
-            'pressure' => $validated['pressure'],
+            'temperature' => $validated['temperature'] ?? null,
+            'humidity' => $validated['humidity'] ?? null,
+            'pressure' => $validated['pressure'] ?? null,
             'battery' => $validated['battery'] ?? null,
             'rssi' => $validated['rssi'] ?? null,
+            'bme_status' => $validated['bme_status'] ?? true,
+            'solar_status' => $validated['solar_status'] ?? 'idle',
         ]);
 
         // 4. Update the device's last_seen timestamp

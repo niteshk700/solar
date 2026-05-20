@@ -15,6 +15,8 @@ class WeatherLog extends Model
         'pressure',
         'battery',
         'rssi',
+        'bme_status',
+        'solar_status',
         'created_at',
     ];
 
@@ -24,6 +26,7 @@ class WeatherLog extends Model
         'humidity' => 'float',
         'pressure' => 'float',
         'battery' => 'float',
+        'bme_status' => 'boolean',
     ];
 
     public function device()

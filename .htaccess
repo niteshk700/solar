@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Forward all requests to the public directory silently
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# 2. Block direct web access to sensitive environment and configuration files
+<FilesMatch "^\.env|composer\.json|package\.json|artisan|composer\.lock|package-lock\.json">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# 3. Disable directory browsing for safety
+Options -Indexes

@@ -32,8 +32,8 @@
 
 // ================= USER CONFIGURATION =================
 // Device Registration Details (Must match Laravel Device Management)
-const char* DEVICE_ID     = "weather_node_01";
-const char* API_KEY       = "secret_node_01_key";
+const char* DEVICE_ID     = "solar_data_collector_v1";
+const char* API_KEY       = "SolarDataCollectionV1";
 
 // Laravel Server API Endpoint
 const char* SERVER_URL    = "https://solar.yourdev.in/api/weather-data";

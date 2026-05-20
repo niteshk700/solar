@@ -26,20 +26,10 @@ class DatabaseSeeder extends Seeder
 
         // 2. Create IoT Devices (Clean registration with no mock history)
         \App\Models\Device::updateOrCreate(
-            ['device_id' => 'weather_node_01'],
+            ['device_id' => 'solar_data_collector_v1'],
             [
-                'api_key' => 'secret_node_01_key',
-                'device_name' => 'Solar Meadow Node',
-                'status' => 'active',
-                'last_seen' => null,
-            ]
-        );
-
-        \App\Models\Device::updateOrCreate(
-            ['device_id' => 'weather_node_02'],
-            [
-                'api_key' => 'secret_node_02_key',
-                'device_name' => 'Solar Roof Node',
+                'api_key' => 'SolarDataCollectionV1',
+                'device_name' => 'Solar Data Collector v1',
                 'status' => 'active',
                 'last_seen' => null,
             ]

@@ -23,7 +23,7 @@
     <div class="glass-card p-4 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Temperature</span>
-            <div class="stat-card-value text-danger">{{ $stats['avg_temp'] }}°C</div>
+            <div class="stat-card-value text-danger">{{ isset($stats['avg_temp']) ? $stats['avg_temp'] . '°C' : '--' }}</div>
             <span class="text-muted small">Across active nodes</span>
         </div>
         <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--secondary);">
@@ -35,7 +35,7 @@
     <div class="glass-card p-4 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Humidity</span>
-            <div class="stat-card-value text-primary">{{ $stats['avg_hum'] }}%</div>
+            <div class="stat-card-value text-primary">{{ isset($stats['avg_hum']) ? $stats['avg_hum'] . '%' : '--' }}</div>
             <span class="text-muted small">Relative air moisture</span>
         </div>
         <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
@@ -47,7 +47,7 @@
     <div class="glass-card p-4 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Air Pressure</span>
-            <div class="stat-card-value text-info">{{ $stats['avg_press'] }} hPa</div>
+            <div class="stat-card-value text-info">{{ isset($stats['avg_press']) ? $stats['avg_press'] . ' hPa' : '--' }}</div>
             <span class="text-muted small">Sea-level adjusted</span>
         </div>
         <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--info);">
@@ -60,16 +60,20 @@
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Battery Cell</span>
             <div class="stat-card-value text-success">
-                {{ $stats['avg_battery'] }}V 
-                <span style="font-size: 0.95rem; font-weight: 500;" class="text-secondary">
-                    @php
-                        $pct = 0;
-                        if ($stats['avg_battery'] >= 4.2) $pct = 100;
-                        elseif ($stats['avg_battery'] <= 3.5) $pct = 0;
-                        else $pct = round((($stats['avg_battery'] - 3.5) / 0.7) * 100);
-                    @endphp
-                    ({{ $pct }}%)
-                </span>
+                @if(isset($stats['avg_battery']))
+                    {{ $stats['avg_battery'] }}V 
+                    <span style="font-size: 0.95rem; font-weight: 500;" class="text-secondary">
+                        @php
+                            $pct = 0;
+                            if ($stats['avg_battery'] >= 4.2) $pct = 100;
+                            elseif ($stats['avg_battery'] <= 3.5) $pct = 0;
+                            else $pct = round((($stats['avg_battery'] - 3.5) / 0.7) * 100);
+                        @endphp
+                        ({{ $pct }}%)
+                    </span>
+                @else
+                    --
+                @endif
             </div>
             <span class="text-muted small">Solar charging state</span>
         </div>

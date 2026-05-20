@@ -58,10 +58,10 @@ class DashboardController extends Controller
             'online_devices' => $devices->filter(fn($d) => $d->is_online)->count(),
             'offline_devices' => $devices->filter(fn($d) => !$d->is_online && $d->status === 'active')->count(),
             'inactive_devices' => $devices->filter(fn($d) => $d->status === 'inactive')->count(),
-            'avg_temp' => $logCount > 0 ? round($avgTemp / $logCount, 1) : 0,
-            'avg_hum' => $logCount > 0 ? round($avgHum / $logCount, 1) : 0,
-            'avg_press' => $logCount > 0 ? round($avgPress / $logCount, 1) : 0,
-            'avg_battery' => $logCount > 0 ? round($avgBattery / $logCount, 2) : 0,
+            'avg_temp' => $logCount > 0 ? round($avgTemp / $logCount, 1) : null,
+            'avg_hum' => $logCount > 0 ? round($avgHum / $logCount, 1) : null,
+            'avg_press' => $logCount > 0 ? round($avgPress / $logCount, 1) : null,
+            'avg_battery' => $logCount > 0 ? round($avgBattery / $logCount, 2) : null,
         ];
 
         // Fetch recent weather stream (latest 10 data packets received globally)

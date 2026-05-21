@@ -162,7 +162,7 @@
         </a>
         <a href="{{ route('dashboard.solar-export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
             <i class="fa-solid fa-solar-panel text-warning"></i>
-            <span>Export Solar Logs</span>
+            <span>Export Logs</span>
         </a>
         <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
             <i class="fa-solid fa-plus"></i>
@@ -756,7 +756,7 @@ document.addEventListener("DOMContentLoaded", function() {
             labels: solarLabels,
             datasets: [
                 {
-                    label: 'Solar Active Power (kW)',
+                    label: 'Active Power (kW)',
                     data: solarPowerData,
                     borderColor: '#F59E0B',
                     backgroundColor: solarGradient,

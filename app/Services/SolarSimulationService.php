@@ -104,14 +104,20 @@ class SolarSimulationService
     /**
      * Generate list of historical points for a date, capping at $maxTime if it is today.
      * Generates logs at 1-hour intervals.
+     * Generates logs at 2-hour intervals.
      */
     public function getDailyPoints(Carbon $date, ?Carbon $maxTime = null): array
     {
         $points = [];
         $isToday = $maxTime && $date->isSameDay($maxTime);
 
-        for ($h = 0; $h < 24; $h++) {
-            $pointTime = $date->copy()->setTime($h, 0, 0);
+        for ($h = 0; $h <= 24; $h += 2) {
+            $pointTime = $date->copy();
+            if ($h === 24) {
+                $pointTime->setTime(23, 59, 59);
+            } else {
+                $pointTime->setTime($h, 0, 0);
+            }
 
             // If we are simulating today, do not produce future points!
             if ($isToday && $pointTime->gt($maxTime)) {
@@ -120,7 +126,7 @@ class SolarSimulationService
 
             $stats = $this->getLiveStats($pointTime);
             $points[] = array_merge([
-                'time' => $pointTime->format('H:i:s'),
+                'time' => $h === 24 ? '24:00:00' : sprintf('%02d:00:00', $h),
                 'timestamp' => $pointTime->toIso8601String(),
             ], $stats);
         }

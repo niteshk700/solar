@@ -10,18 +10,18 @@
     --font-heading: 'Outfit', 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
     
-    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    --mesh-color-1: rgba(99, 102, 241, 0.02);
-    --mesh-color-2: rgba(244, 63, 94, 0.02);
-    --mesh-color-3: rgba(16, 185, 129, 0.02);
+    --bg-gradient: #f8fafc;
+    --mesh-color-1: transparent;
+    --mesh-color-2: transparent;
+    --mesh-color-3: transparent;
     
-    --glass-bg: rgba(255, 255, 255, 0.45);
-    --glass-border: rgba(0, 0, 0, 0.06);
-    --glass-shadow: rgba(0, 0, 0, 0.02);
+    --glass-bg: #ffffff;
+    --glass-border: rgba(0, 0, 0, 0.05);
+    --glass-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
     
-    --card-bg: rgba(255, 255, 255, 0.6);
-    --card-border: rgba(0, 0, 0, 0.06);
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    --card-bg: #ffffff;
+    --card-border: rgba(0, 0, 0, 0.05);
+    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
     
     --text-primary: #0f172a;
     --text-secondary: #475569;
@@ -29,20 +29,20 @@
     
     /* Brand & Accent Colors (Harmony-rich HSL) */
     --primary: hsl(215, 80%, 45%);
-    --primary-glow: rgba(59, 130, 246, 0.1);
+    --primary-glow: rgba(59, 130, 246, 0.08);
     --secondary: hsl(215, 60%, 40%);
     --accent: hsl(150, 60%, 35%);
-    --accent-glow: rgba(16, 185, 129, 0.1);
+    --accent-glow: rgba(16, 185, 129, 0.08);
     --warning: hsl(38, 85%, 45%);
     --danger: hsl(0, 75%, 50%);
     --info: hsl(200, 80%, 40%);
     
-    --sidebar-bg: rgba(255, 255, 255, 0.6);
-    --sidebar-border: rgba(0, 0, 0, 0.06);
-    --sidebar-active: rgba(59, 130, 246, 0.06);
+    --sidebar-bg: #ffffff;
+    --sidebar-border: rgba(0, 0, 0, 0.05);
+    --sidebar-active: rgba(59, 130, 246, 0.05);
     
-    --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    --blur-strength: 12px;
+    --transition-smooth: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    --blur-strength: 0px;
 }
 
 /* Dark Theme Variables */

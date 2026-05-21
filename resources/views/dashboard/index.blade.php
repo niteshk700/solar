@@ -24,9 +24,11 @@
 .glass-card:hover::before {
     left: 150%;
 }
-.glass-card:hover {
-    transform: translateY(-4px) scale(1.008);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 0 1px rgba(255, 255, 255, 0.25) !important;
+@media (min-width: 769px) {
+    .glass-card:hover {
+        transform: translateY(-4px) scale(1.008);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 0 1px rgba(255, 255, 255, 0.25) !important;
+    }
 }
 /* Neon status pulses */
 .pulse-online {
@@ -53,6 +55,88 @@
 }
 .chart-card {
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ==========================================
+   ADVANCED MOBILE & RESPONSIVE GRID OVERRIDES
+   ========================================== */
+@media (max-width: 991px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Responsive Content Header Layout */
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 16px !important;
+        margin-bottom: 24px !important;
+    }
+    .content-header > div:last-child {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px !important;
+    }
+    .content-header .btn {
+        flex: 1 1 calc(50% - 6px);
+        justify-content: center;
+        padding: 12px 16px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Sleek touch optimizations */
+    .glass-card {
+        padding: 18px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Compress titles to fit mobile viewports */
+    .content-title {
+        font-size: 1.6rem !important;
+        line-height: 1.25 !important;
+    }
+    .content-subtitle {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Single Column Cards for Stats */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    /* Scale chart height for compact touch screen display */
+    .chart-container-wrapper {
+        height: 230px !important;
+    }
+    
+    /* Adapt action button stack */
+    .content-header .btn {
+        flex: 1 1 100% !important;
+    }
+    
+    /* Badge spacing alignment for tiny screens */
+    .dev-telemetry-body .row .col-4 {
+        padding: 0 4px !important;
+    }
+    .dev-telemetry-body .row {
+        margin-left: -4px !important;
+        margin-right: -4px !important;
+    }
+    .dev-telemetry-body .row .p-2 {
+        padding: 6px 4px !important;
+        min-height: 48px !important;
+    }
+    
+    /* Relative time label centering */
+    .dev-last-seen {
+        font-size: 0.75rem !important;
+    }
 }
 </style>
 
@@ -159,7 +243,7 @@
                     </span>
                 </div>
             </div>
-            <div style="position: relative; height: 320px; width: 100%;">
+            <div class="chart-container-wrapper" style="position: relative; height: 320px; width: 100%;">
                 <canvas id="liveTelemetryChart"></canvas>
             </div>
         </div>

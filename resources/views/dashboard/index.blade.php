@@ -171,6 +171,31 @@
     </div>
 </div>
 
+<!-- Nitra Brand System Status Banner -->
+<div class="row mb-4 animate-fade-in">
+    <div class="col-12">
+        <div class="glass-card p-3 border-0 d-flex flex-wrap align-items-center justify-content-between gap-3" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(245, 158, 11, 0.04)); border-left: 4px solid var(--warning) !important;">
+            <div class="d-flex align-items-center gap-3">
+                <div style="background: rgba(245, 158, 11, 0.1); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--warning);">
+                    <i class="fa-solid fa-graduation-cap" style="font-size: 1.25rem;"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">Nitra Technical Campus - Green Campus Initiative</div>
+                    <div class="text-secondary small" style="font-size: 0.78rem;">Rooftop Solar Telemetry Gateway & IoT Weather Analytics Node Network</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge form-control-glass text-success border-0 px-2.5 py-1.5 small fw-semibold" style="font-size: 0.72rem;">
+                    <span class="pulse-online me-1.5" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981;"></span>Secure Intranet
+                </span>
+                <span class="badge form-control-glass text-warning border-0 px-2.5 py-1.5 small fw-semibold" style="font-size: 0.72rem;">
+                    <i class="fa-solid fa-server me-1.5"></i>Live Gateway
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Aggregated Metrics Grid -->
 <div class="stats-grid">
     <!-- Temp Card -->

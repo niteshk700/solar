@@ -205,6 +205,24 @@
 
             <!-- Page-specific dynamic contents -->
             @yield('content')
+
+            <!-- Branded Academic Footer -->
+            <footer class="mt-5 mb-4 text-secondary" style="font-size: 0.75rem; opacity: 0.85;">
+                <hr style="border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px;">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        © 2026 <strong class="text-white">Nitra Technical Campus</strong>. All Rights Reserved.
+                    </div>
+                    <div class="text-muted">
+                        Developed by <span class="text-warning fw-semibold">Department of Electrical & Electronics Engineering</span>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a href="https://nitra.ac.in" target="_blank" class="text-secondary text-decoration-none hover-warning" style="transition: color 0.2s;">nitra.ac.in</a>
+                        <span>•</span>
+                        <a href="#" class="text-secondary text-decoration-none">System Status</a>
+                    </div>
+                </div>
+            </footer>
         </main>
     </div>
 

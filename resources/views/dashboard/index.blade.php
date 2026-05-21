@@ -155,6 +155,10 @@
             <i class="fa-solid fa-file-csv text-success"></i>
             <span>Export Excel</span>
         </a>
+        <a href="{{ route('dashboard.solar-export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
+            <i class="fa-solid fa-solar-panel text-warning"></i>
+            <span>Export Solar Logs</span>
+        </a>
         <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
             <i class="fa-solid fa-plus"></i>
             <span>Manage Devices</span>
@@ -224,6 +228,101 @@
         </div>
         <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
             <i class="fa-solid fa-battery-three-quarters" style="font-size: 1.5rem;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- 100kW Live Solar Generation Panel -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="glass-card p-4 border-premium-accent" style="border: 1px solid rgba(245, 158, 11, 0.25) !important;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                <div>
+                    <h3 class="h5 font-heading fw-bold m-0 d-flex align-items-center gap-2 text-warning">
+                        <i class="fa-solid fa-solar-panel"></i>
+                        <span>100kW Solar Meter - System Generated</span>
+                    </h3>
+                    <p class="text-muted small m-0">Synchronized simulated live solar grid feeds</p>
+                </div>
+                <div>
+                    <span class="badge form-control-glass text-warning px-2.5 py-1.5 small" id="solar-status-badge">
+                        <span class="pulse-online me-1.5" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #F59E0B !important; box-shadow: 0 0 10px #F59E0B;"></span>LIVE METER ACTIVE
+                    </span>
+                </div>
+            </div>
+
+            <!-- Solar Metrics Row -->
+            <div class="row g-3 mb-4 text-center">
+                <!-- Active Power -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: rgba(245, 158, 11, 0.04);">
+                        <div class="text-muted small mb-1" style="font-size: 0.75rem;">Active Power</div>
+                        <div class="fw-bold text-warning h4 m-0" id="solar-active-power">
+                            {{ number_format($solarStats['active_power'], 2) }} kW
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.65rem;"><i class="fa-solid fa-bolt text-warning me-1"></i>Live feed</span>
+                    </div>
+                </div>
+                <!-- Gen Today -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                        <div class="text-muted small mb-1" style="font-size: 0.75rem;">Gen (kWh)</div>
+                        <div class="fw-bold text-white h4 m-0" id="solar-gen-today">
+                            {{ number_format($solarStats['gen_today'], 2) }}
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.65rem;">Today's energy</span>
+                    </div>
+                </div>
+                <!-- Specific Yield -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                        <div class="text-muted small mb-1" style="font-size: 0.75rem;">Specific Yield</div>
+                        <div class="fw-bold text-info h4 m-0" id="solar-sy">
+                            {{ number_format($solarStats['sy'], 2) }}
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.65rem;">kWh/kWp</span>
+                    </div>
+                </div>
+                <!-- CO2 Reduction -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                        <div class="text-muted small mb-1" style="font-size: 0.75rem;">CO2 (Tonnes)</div>
+                        <div class="fw-bold text-success h4 m-0" id="solar-co2">
+                            {{ number_format($solarStats['co2'], 2) }}
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.65rem;">Saved weight</span>
+                    </div>
+                </div>
+                <!-- CUF -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                        <div class="text-muted small mb-1" style="font-size: 0.75rem;">CUF (%)</div>
+                        <div class="fw-bold text-accent h4 m-0" id="solar-cuf">
+                            {{ number_format($solarStats['cuf'] * 100, 2) }}%
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.65rem;">Capacity factor</span>
+                    </div>
+                </div>
+                <!-- Grid / DG Status -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: rgba(255,255,255,0.02);">
+                        <div class="text-muted small mb-1" style="font-size: 0.7rem; line-height: 1.1;">Grid / DG (kW)</div>
+                        <div class="fw-semibold text-secondary m-0" style="font-size: 1.15rem;">
+                            0.00 / 0.00
+                        </div>
+                        <span class="text-muted small" style="font-size: 0.65rem;">Standard inputs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solar Real-Time Curve Chart -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="chart-container-wrapper" style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="solarRealtimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -603,6 +702,84 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // 1.5 Setup Chart.js Solar Power Monitor
+    const solarCtx = document.getElementById('solarRealtimeChart').getContext('2d');
+    
+    // Yellow/Orange Gradient for Solar Active Power
+    const solarGradient = solarCtx.createLinearGradient(0, 0, 0, 240);
+    solarGradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+    solarGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+
+    const initialSolarPoints = @json($todaySolarPoints);
+    const solarLabels = [];
+    const solarPowerData = [];
+
+    initialSolarPoints.forEach(pt => {
+        solarLabels.push(pt.time.substring(0, 5));
+        solarPowerData.push(parseFloat(pt.active_power));
+    });
+
+    const solarChart = new Chart(solarCtx, {
+        type: 'line',
+        data: {
+            labels: solarLabels,
+            datasets: [
+                {
+                    label: 'Solar Active Power (kW)',
+                    data: solarPowerData,
+                    borderColor: '#F59E0B',
+                    backgroundColor: solarGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#F59E0B',
+                    pointHoverRadius: 7,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: { family: 'Outfit, Inter, sans-serif', size: 12, weight: '500' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    padding: 10,
+                    callbacks: {
+                        label: function(context) {
+                            return `Power: ${context.parsed.y.toFixed(2)} kW`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    min: 0,
+                    max: 100,
+                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                    ticks: { color: 'rgba(245, 158, 11, 0.7)', font: { size: 10 } },
+                    title: { display: true, text: 'Active Power (kW)', color: 'rgba(245, 158, 11, 0.7)' }
+                }
+            }
+        }
+    });
+
     // 2. Main Live Data Polling Engine
     function fetchLiveData() {
         fetch(liveUrl)
@@ -627,6 +804,29 @@ document.addEventListener("DOMContentLoaded", function() {
                     updateAnimatedHtml(avgBatteryEl, newHtml);
                 } else if (avgBatteryEl) {
                     updateAnimatedValue(avgBatteryEl, '--');
+                }
+
+                // Update live solar metrics
+                if (data.solarStats) {
+                    const solar = data.solarStats;
+                    updateAnimatedValue(document.getElementById('solar-active-power'), parseFloat(solar.active_power).toFixed(2) + ' kW');
+                    updateAnimatedValue(document.getElementById('solar-gen-today'), parseFloat(solar.gen_today).toFixed(2));
+                    updateAnimatedValue(document.getElementById('solar-sy'), parseFloat(solar.sy).toFixed(2));
+                    updateAnimatedValue(document.getElementById('solar-co2'), parseFloat(solar.co2).toFixed(2));
+                    updateAnimatedValue(document.getElementById('solar-cuf'), (parseFloat(solar.cuf) * 100).toFixed(2) + '%');
+                }
+
+                // Update solar trend curve chart
+                if (data.todaySolarPoints) {
+                    const labels = [];
+                    const powerData = [];
+                    data.todaySolarPoints.forEach(pt => {
+                        labels.push(pt.time.substring(0, 5));
+                        powerData.push(parseFloat(pt.active_power));
+                    });
+                    solarChart.data.labels = labels;
+                    solarChart.data.datasets[0].data = powerData;
+                    solarChart.update('none');
                 }
 
                 // Update total registered device count title

@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/live', [DashboardController::class, 'liveData'])->name('dashboard.live');
     Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
+    Route::get('/dashboard/solar-export', [DashboardController::class, 'exportSolar'])->name('dashboard.solar-export');
 
     // Device Management CRUD
     Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');

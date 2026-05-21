@@ -104,7 +104,11 @@ class DashboardController extends Controller
                 return $log;
             });
 
-        return compact('devices', 'stats', 'recentLogs');
+        $solarService = new \App\Services\SolarSimulationService();
+        $solarStats = $solarService->getLiveStats(now('Asia/Kolkata'));
+        $todaySolarPoints = $solarService->getDailyPoints(now('Asia/Kolkata'), now('Asia/Kolkata'));
+
+        return compact('devices', 'stats', 'recentLogs', 'solarStats', 'todaySolarPoints');
     }
 
     /**
@@ -167,6 +171,100 @@ class DashboardController extends Controller
                         ]);
                     }
                 });
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Stream simulated solar telemetry logs as a high-performance CSV download.
+     */
+    public function exportSolar(Request $request)
+    {
+        $fileName = 'solar_telemetry_export_' . date('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() {
+            $file = fopen('php://output', 'w');
+            
+            // Write CSV UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // Header Row
+            fputcsv($file, [
+                'Timestamp', 
+                'Date',
+                'Time',
+                'Active Power (kW)', 
+                'Energy Generated Today (kWh)', 
+                'Specific Yield (SY)', 
+                'CO2 Reduction (Tonnes)', 
+                'CUF (%)',
+                'Total Grid (kW)',
+                'Total DG (kW)'
+            ]);
+
+            $solarService = new \App\Services\SolarSimulationService();
+            $now = Carbon::now('Asia/Kolkata');
+
+            // The dates we want to export
+            $dates = [
+                // 2023
+                '2023-05-22',
+                '2023-05-23',
+                '2023-05-24',
+                // 2024
+                '2024-05-22',
+                '2024-05-23',
+                '2024-05-24',
+                // 2025
+                '2025-05-22',
+                '2025-05-23',
+                '2025-05-24',
+                // 2026 (Live presentation dates)
+                '2026-05-21',
+                '2026-05-22',
+                '2026-05-23',
+                '2026-05-24',
+            ];
+
+            foreach ($dates as $dateStr) {
+                $dateObj = Carbon::parse($dateStr, 'Asia/Kolkata');
+                
+                // If this date is in the future relative to today, skip it entirely
+                if ($dateObj->isAfter($now->copy()->endOfDay())) {
+                    continue;
+                }
+
+                // Generate hourly points
+                // If it is the current day, cap at the current local time
+                $maxTime = $dateObj->isSameDay($now) ? $now : null;
+                $points = $solarService->getDailyPoints($dateObj, $maxTime);
+
+                foreach ($points as $pt) {
+                    fputcsv($file, [
+                        Carbon::parse($pt['timestamp'])->format('Y-m-d H:i:s'),
+                        $dateObj->format('d/m/Y'),
+                        Carbon::parse($pt['timestamp'])->format('H:i'),
+                        number_format($pt['active_power'], 2),
+                        number_format($pt['gen_today'], 2),
+                        number_format($pt['sy'], 2),
+                        number_format($pt['co2'], 2),
+                        number_format($pt['cuf'], 2),
+                        number_format($pt['total_grid'], 2),
+                        number_format($pt['total_dg'], 2)
+                    ]);
+                }
+            }
             
             fclose($file);
         };

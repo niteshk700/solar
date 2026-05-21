@@ -84,7 +84,10 @@ void setup() {
   pinMode(PIN_TP4056_CHRG, INPUT_PULLUP);
   pinMode(PIN_TP4056_STDBY, INPUT_PULLUP);
 
-  // 2. Initialize BME280 Sensor (Auto-detecting 0x76 and 0x77 addresses)
+  // 2. Initialize the I2C Bus on pins D2 (SDA/4) and D1 (SCL/5) explicitly
+  Wire.begin(4, 5); // SDA = GPIO 4 (D2), SCL = GPIO 5 (D1)
+
+  // 3. Initialize BME280 Sensor (Auto-detecting 0x76 and 0x77 addresses)
   if (bme.begin(0x76) || bme.begin(0x77)) {
     bmeConnected = true;
     Serial.println("BME280 Environmental Sensor successfully initialized!");

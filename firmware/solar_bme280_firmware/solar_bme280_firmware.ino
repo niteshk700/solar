@@ -68,8 +68,8 @@ const char* API_KEY       = "SolarDataCollectionV1";
 // Laravel Server API Endpoint
 const char* SERVER_URL    = "https://solar.yourdev.in/api/weather-data";
 
-// Deep Sleep Duration: 5 minutes (in microseconds)
-const uint64_t SLEEP_DURATION_US = 5 * 60 * 1000000ULL; 
+// Deep Sleep Duration: 10 seconds (for rapid bench-testing and debugging)
+const uint64_t SLEEP_DURATION_US = 10 * 1000000ULL; 
 
 // Captive Portal Hotspot configuration
 const char* PORTAL_AP_SSID = "Solar_Weather_Setup"; // Open SSID name

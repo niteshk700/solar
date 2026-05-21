@@ -84,8 +84,8 @@ void setup() {
   pinMode(PIN_TP4056_CHRG, INPUT_PULLUP);
   pinMode(PIN_TP4056_STDBY, INPUT_PULLUP);
 
-  // 2. Initialize BME280 Sensor
-  if (bme.begin(0x76)) { // Alternate address is 0x77
+  // 2. Initialize BME280 Sensor (Auto-detecting 0x76 and 0x77 addresses)
+  if (bme.begin(0x76) || bme.begin(0x77)) {
     bmeConnected = true;
     Serial.println("BME280 Environmental Sensor successfully initialized!");
   } else {

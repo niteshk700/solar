@@ -18,7 +18,7 @@
  *    [DHT11 Pin]       --->  [NodeMCU Pin]   --->  [Description]
  *    VCC               --->  3V3             --->  Power Supply (3.3V)
  *    GND               --->  GND             --->  System Ground
- *    DATA              --->  D8 (GPIO 15)    --->  Digital Sensor Data Bus
+ *    DATA              --->  D7 (GPIO 13)    --->  Digital Sensor Data Bus
  * 
  * 3. TP4056 Solar Charger Module
  *    [TP4056 Pin]      --->  [Connection]    --->  [Description]
@@ -82,7 +82,7 @@ const int PIN_TP4056_STDBY = 12; // D6 on NodeMCU (GPIO 12)
 
 // Instantiate sensor drivers globally
 Adafruit_BME280 bme; // I2C Mode
-#define DHTPIN 15    // D8 on NodeMCU is GPIO 15
+#define DHTPIN 13    // D7 on NodeMCU is GPIO 13 (Strapping-safe pin)
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -109,7 +109,7 @@ void setup() {
   }
 
   // 3. Initialize DHT11 Sensor (Backup / Secondary)
-  Serial.println("Initializing DHT11 on pin D8...");
+  Serial.println("Initializing DHT11 on pin D7...");
   dht.begin();
   
   // Try reading DHT11 to check if physically present

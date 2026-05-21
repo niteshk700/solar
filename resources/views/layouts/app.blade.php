@@ -34,7 +34,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <!-- Custom Glassmorphism Stylesheet -->
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}?v={{ time() }}" rel="stylesheet">
 
     <style>
     /* PWA Install Banner */
@@ -118,111 +118,110 @@
     <div class="bg-mesh"></div>
 
     <div class="app-wrapper">
-        <!-- 1. Mobile Navigation Header -->
-        <header class="mobile-nav">
-            <button class="mobile-nav-toggle" id="sidebarToggleMobile" aria-label="Toggle Sidebar">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="d-flex align-items-center gap-2" style="margin: 0;">
-                <img src="/icons/icon-32.png" alt="Solar Weather Logo" style="width: 26px; height: 26px; border-radius: 7px;">
-                <span class="sidebar-brand-name" style="font-size: 1.05rem; margin: 0;">Solar Weather</span>
-            </div>
-            <button class="theme-toggle-btn" id="themeToggleBtnMobile" aria-label="Toggle Dark Mode">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-        </header>
+        <!-- Sticky Horizontal Glass Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-glass">
+            <div class="container-xl">
+                <!-- Branding Brand & Logo -->
+                <a href="{{ route('dashboard') }}" class="navbar-brand-custom">
+                    <div style="background: #ffffff; padding: 3px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                        <img src="https://nitra.ac.in/wp-content/uploads/2024/08/cropped-cropped-Untitled-design-7.png" alt="Nitra Logo"
+                             style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
+                    </div>
+                    <span class="d-none d-sm-inline text-primary">Nitra Technical Campus <span class="text-warning">Solar Portal</span></span>
+                    <span class="d-inline d-sm-none text-warning">Solar</span>
+                </a>
 
-        <!-- 2. Responsive Sidebar -->
-        <aside class="sidebar" id="sidebarLayout">
-            <a href="{{ route('dashboard') }}" class="sidebar-brand">
-                <div class="sidebar-brand-icon" style="background: #ffffff; padding: 3px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                    <img src="https://nitra.ac.in/wp-content/uploads/2024/08/cropped-cropped-Untitled-design-7.png" alt="Nitra Logo"
-                         style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
-                </div>
-                <span class="sidebar-brand-name" style="font-size: 0.85rem; line-height: 1.2; text-align: left;">
-                    Nitra Campus<br>
-                    <span class="text-warning" style="font-size: 0.72rem; font-weight: 600;">Solar Portal</span>
-                </span>
-            </a>
-
-            <nav class="sidebar-menu-wrapper">
-                <ul class="sidebar-menu">
-                    <li>
-                        <a href="{{ route('dashboard') }}" class="sidebar-link {{ Route::is('dashboard') ? 'active' : '' }}">
+                <!-- Collapsible Navigation Links (Centered) -->
+                <div class="collapse navbar-collapse-glass" id="navbarContent">
+                    <div class="navbar-nav mx-auto gap-1">
+                        <a href="{{ route('dashboard') }}" class="nav-link-custom {{ Route::is('dashboard') ? 'active' : '' }}">
                             <i class="fa-solid fa-chart-line"></i>
                             <span>Dashboard</span>
                         </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('devices.index') }}" class="sidebar-link {{ Route::is('devices.index') || Route::is('devices.analytics') ? 'active' : '' }}">
+                        <a href="{{ route('devices.index') }}" class="nav-link-custom {{ Route::is('devices.index') || Route::is('devices.analytics') ? 'active' : '' }}">
                             <i class="fa-solid fa-microchip"></i>
                             <span>Devices</span>
                         </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('settings.index') }}" class="sidebar-link {{ Route::is('settings.index') ? 'active' : '' }}">
+                        <a href="{{ route('settings.index') }}" class="nav-link-custom {{ Route::is('settings.index') ? 'active' : '' }}">
                             <i class="fa-solid fa-sliders"></i>
                             <span>Settings</span>
                         </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <footer class="sidebar-footer">
-                @auth
-                <div class="sidebar-user">
-                    <div class="sidebar-user-avatar">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                    </div>
-                    <div class="sidebar-user-info">
-                        <div class="sidebar-user-name">{{ Auth::user()->name }}</div>
-                        <div class="sidebar-user-role">Administrator</div>
                     </div>
                 </div>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-premium-secondary w-100 d-flex align-items-center justify-content-center gap-2">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
-                @endauth
-            </footer>
-        </aside>
 
-        <!-- 3. Main Content Container -->
-        <main class="main-content">
-            <!-- Header bar for larger displays -->
-            <div class="d-none d-lg-flex justify-content-end align-items-center mb-4 gap-3">
-                <button class="theme-toggle-btn" id="themeToggleBtnDesktop" aria-label="Toggle Dark Mode">
-                    <i class="fa-solid fa-moon"></i>
-                </button>
-                <div class="text-secondary small">
-                    <i class="fa-regular fa-clock me-1"></i>
-                    <span id="liveClock">--:--:--</span>
+                <!-- Right Side Actions: Clock, Theme, Profile Dropdown, Mobile menu toggler -->
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Clock -->
+                    <div class="text-secondary small d-none d-md-flex align-items-center gap-1">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="liveClock">--:--:--</span>
+                    </div>
+
+                    <!-- Theme Toggle Button -->
+                    <button class="theme-toggle-btn m-0" id="themeToggleNavbarBtn" aria-label="Toggle Dark Mode">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+
+                    <!-- User Profile Dropdown -->
+                    @auth
+                    <div class="dropdown">
+                        <div class="profile-avatar-custom dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-glass" aria-labelledby="profileDropdown">
+                            <li class="px-3 py-2 border-bottom border-secondary-subtle mb-1">
+                                <div class="fw-bold small text-primary">{{ Auth::user()->name }}</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Administrator</div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-custom" href="{{ route('settings.index') }}">
+                                    <i class="fa-solid fa-sliders me-2"></i> Settings
+                                </a>
+                            </li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="d-block w-100">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item dropdown-item-custom text-danger w-100 border-0 bg-transparent text-start">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    @endauth
+
+                    <!-- Mobile Toggler Menu button -->
+                    <button class="navbar-toggler d-lg-none text-secondary border-0 p-1" type="button" id="mobileNavbarToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars" style="font-size: 1.3rem;"></i>
+                    </button>
                 </div>
             </div>
+        </nav>
 
-            <!-- Page-specific dynamic contents -->
-            @yield('content')
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="container-xl">
+                <!-- Page-specific dynamic contents -->
+                @yield('content')
 
-            <!-- Branded Academic Footer -->
-            <footer class="mt-5 mb-4 text-secondary" style="font-size: 0.75rem; opacity: 0.85;">
-                <hr style="border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px;">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                    <div>
-                        © 2026 <strong class="text-white">Nitra Technical Campus</strong>. All Rights Reserved.
+                <!-- Branded Academic Footer -->
+                <footer class="mt-5 mb-4 text-secondary" style="font-size: 0.75rem; opacity: 0.85;">
+                    <hr style="border-top: 1px solid var(--glass-border); margin-bottom: 20px;">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            © 2026 <strong class="text-white">Nitra Technical Campus</strong>. All Rights Reserved.
+                        </div>
+                        <div class="text-muted">
+                            Developed by <span class="text-warning fw-semibold">Department of Electrical & Electronics Engineering</span>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <a href="https://nitra.ac.in" target="_blank" class="text-secondary text-decoration-none hover-warning" style="transition: color 0.2s;">nitra.ac.in</a>
+                            <span>•</span>
+                            <a href="#" class="text-secondary text-decoration-none">System Status</a>
+                        </div>
                     </div>
-                    <div class="text-muted">
-                        Developed by <span class="text-warning fw-semibold">Department of Electrical & Electronics Engineering</span>
-                    </div>
-                    <div class="d-flex gap-3">
-                        <a href="https://nitra.ac.in" target="_blank" class="text-secondary text-decoration-none hover-warning" style="transition: color 0.2s;">nitra.ac.in</a>
-                        <span>•</span>
-                        <a href="#" class="text-secondary text-decoration-none">System Status</a>
-                    </div>
-                </div>
-            </footer>
+                </footer>
+            </div>
         </main>
     </div>
 
@@ -248,16 +247,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Theme toggling elements
-            const btnDesktop = document.getElementById('themeToggleBtnDesktop');
-            const btnMobile = document.getElementById('themeToggleBtnMobile');
+            const btnTheme = document.getElementById('themeToggleNavbarBtn');
             const htmlElement = document.documentElement;
 
             function updateThemeButtons(theme) {
                 const icon = theme === 'dark' ? 'fa-sun' : 'fa-moon';
                 const classToAdd = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
                 
-                if (btnDesktop) btnDesktop.innerHTML = `<i class="${classToAdd}"></i>`;
-                if (btnMobile) btnMobile.innerHTML = `<i class="${classToAdd}"></i>`;
+                if (btnTheme) btnTheme.innerHTML = `<i class="${classToAdd}"></i>`;
             }
 
             function toggleTheme() {
@@ -270,28 +267,27 @@
             }
 
             // Bind click handlers
-            if (btnDesktop) btnDesktop.addEventListener('click', toggleTheme);
-            if (btnMobile) btnMobile.addEventListener('click', toggleTheme);
+            if (btnTheme) btnTheme.addEventListener('click', toggleTheme);
 
             // Read theme from storage on load
             const savedTheme = localStorage.getItem('solar_theme') || 'light';
             htmlElement.setAttribute('data-theme', savedTheme);
             updateThemeButtons(savedTheme);
 
-            // Responsive Mobile Sidebar Toggle
-            const btnMobileSidebar = document.getElementById('sidebarToggleMobile');
-            const sidebarLayout = document.getElementById('sidebarLayout');
+            // Responsive Mobile Navbar Toggle
+            const mobileToggle = document.getElementById('mobileNavbarToggle');
+            const navbarCollapse = document.getElementById('navbarContent');
 
-            if (btnMobileSidebar && sidebarLayout) {
-                btnMobileSidebar.addEventListener('click', function (e) {
+            if (mobileToggle && navbarCollapse) {
+                mobileToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    sidebarLayout.classList.toggle('show');
+                    navbarCollapse.classList.toggle('show');
                 });
 
                 // Dismiss sidebar when tapping content area
                 document.addEventListener('click', function (e) {
-                    if (sidebarLayout.classList.contains('show') && !sidebarLayout.contains(e.target) && e.target !== btnMobileSidebar) {
-                        sidebarLayout.classList.remove('show');
+                    if (navbarCollapse.classList.contains('show') && !navbarCollapse.contains(e.target) && e.target !== mobileToggle) {
+                        navbarCollapse.classList.remove('show');
                     }
                 });
             }

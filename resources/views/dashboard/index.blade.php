@@ -162,7 +162,7 @@
         </a>
         <a href="{{ route('dashboard.solar-export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
             <i class="fa-solid fa-solar-panel text-warning"></i>
-            <span>Export Logs</span>
+            <span>Export Solar Logs</span>
         </a>
         <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
             <i class="fa-solid fa-plus"></i>
@@ -171,31 +171,7 @@
     </div>
 </div>
 
-<!-- Nitra Brand System Status Banner -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="glass-card p-3 border-0 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05) !important; border-radius: 12px;">
-            <div class="d-flex align-items-center gap-3">
-                <i class="fa-solid fa-graduation-cap text-secondary" style="font-size: 1.1rem; opacity: 0.7;"></i>
-                <div class="text-start">
-                    <span class="text-white fw-semibold" style="font-size: 0.9rem; letter-spacing: 0.3px;">Nitra Technical Campus</span>
-                    <span class="text-muted mx-2 d-none d-sm-inline">•</span>
-                    <span class="text-secondary small d-block d-sm-inline" style="font-size: 0.78rem;">Green Campus Initiative Portal</span>
-                </div>
-            </div>
-            <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
-                <span class="badge form-control-glass text-secondary border-0 px-2.5 py-1.5 small fw-normal d-flex align-items-center gap-1.5" style="font-size: 0.72rem; opacity: 0.85;">
-                    <span class="pulse-online" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
-                    <span>Secure Intranet</span>
-                </span>
-                <span class="badge form-control-glass text-secondary border-0 px-2.5 py-1.5 small fw-normal d-flex align-items-center gap-1.5" style="font-size: 0.72rem; opacity: 0.85;">
-                    <i class="fa-solid fa-server" style="font-size: 0.65rem;"></i>
-                    <span>Live Gateway</span>
-                </span>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Aggregated Metrics Grid -->
 <div class="stats-grid">
@@ -296,9 +272,9 @@
                 </div>
                 <!-- Gen Today -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: rgba(59, 130, 246, 0.04);">
                         <div class="text-muted small mb-1" style="font-size: 0.75rem;">Gen (kWh)</div>
-                        <div class="fw-bold text-white h4 m-0" id="solar-gen-today">
+                        <div class="fw-bold text-primary h4 m-0" id="solar-gen-today">
                             {{ number_format($solarStats['gen_today'], 2) }}
                         </div>
                         <span class="text-muted small" style="font-size: 0.65rem;">Today's energy</span>
@@ -630,18 +606,31 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // Theme-aware helper functions for Chart.js styling
+    function getChartGridColor() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' 
+            ? 'rgba(255, 255, 255, 0.06)' 
+            : 'rgba(15, 23, 42, 0.06)';
+    }
+
+    function getChartTextColor() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' 
+            ? 'rgba(148, 163, 184, 0.8)' 
+            : 'rgba(71, 85, 105, 0.8)';
+    }
+
     // 1. Setup Chart.js Telemetry Monitor
     const ctx = document.getElementById('liveTelemetryChart').getContext('2d');
     
-    // Neon Red Gradient for Temperature
+    // Muted Rose-Red Gradient for Temperature
     const tempGradient = ctx.createLinearGradient(0, 0, 0, 300);
-    tempGradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
-    tempGradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+    tempGradient.addColorStop(0, 'rgba(225, 29, 72, 0.12)');
+    tempGradient.addColorStop(1, 'rgba(225, 29, 72, 0)');
     
-    // Primary Blue Gradient for Humidity
+    // Primary Indigo-Blue Gradient for Humidity
     const humGradient = ctx.createLinearGradient(0, 0, 0, 300);
-    humGradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-    humGradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+    humGradient.addColorStop(0, 'rgba(37, 99, 235, 0.12)');
+    humGradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
     
     // Load initial weather packets from blade loop
     const initialLogs = @json($recentLogs->reverse()->values());
@@ -665,25 +654,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 {
                     label: 'Temperature (°C)',
                     data: tempData,
-                    borderColor: '#EF4444',
+                    borderColor: '#e11d48',
                     backgroundColor: tempGradient,
-                    borderWidth: 3,
+                    borderWidth: 2,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#EF4444',
-                    pointHoverRadius: 7,
+                    tension: 0.35,
+                    pointBackgroundColor: '#e11d48',
+                    pointHoverRadius: 6,
                     yAxisID: 'y'
                 },
                 {
                     label: 'Humidity (%)',
                     data: humData,
-                    borderColor: '#3B82F6',
+                    borderColor: '#2563eb',
                     backgroundColor: humGradient,
-                    borderWidth: 3,
+                    borderWidth: 2,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#3B82F6',
-                    pointHoverRadius: 7,
+                    tension: 0.35,
+                    pointBackgroundColor: '#2563eb',
+                    pointHoverRadius: 6,
                     yAxisID: 'y1'
                 }
             ]
@@ -694,7 +683,7 @@ document.addEventListener("DOMContentLoaded", function() {
             plugins: {
                 legend: {
                     labels: {
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        color: getChartTextColor(),
                         font: { family: 'Outfit, Inter, sans-serif', size: 12, weight: '500' }
                     }
                 },
@@ -710,24 +699,24 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
+                    grid: { color: getChartGridColor() },
+                    ticks: { color: getChartTextColor(), font: { size: 10 } }
                 },
                 y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: 'rgba(239, 68, 68, 0.7)', font: { size: 10 } },
-                    title: { display: true, text: 'Temperature (°C)', color: 'rgba(239, 68, 68, 0.7)' }
+                    grid: { color: getChartGridColor() },
+                    ticks: { color: '#e11d48', font: { size: 10 } },
+                    title: { display: true, text: 'Temperature (°C)', color: '#e11d48' }
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
                     grid: { drawOnChartArea: false },
-                    ticks: { color: 'rgba(59, 130, 246, 0.7)', font: { size: 10 } },
-                    title: { display: true, text: 'Humidity (%)', color: 'rgba(59, 130, 246, 0.7)' }
+                    ticks: { color: '#2563eb', font: { size: 10 } },
+                    title: { display: true, text: 'Humidity (%)', color: '#2563eb' }
                 }
             }
         }
@@ -736,10 +725,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // 1.5 Setup Chart.js Solar Power Monitor
     const solarCtx = document.getElementById('solarRealtimeChart').getContext('2d');
     
-    // Yellow/Orange Gradient for Solar Active Power
+    // Golden-Amber Gradient for Solar Active Power
     const solarGradient = solarCtx.createLinearGradient(0, 0, 0, 240);
-    solarGradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
-    solarGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+    solarGradient.addColorStop(0, 'rgba(217, 119, 6, 0.12)');
+    solarGradient.addColorStop(1, 'rgba(217, 119, 6, 0)');
 
     const initialSolarPoints = @json($todaySolarPoints);
     const solarLabels = [];
@@ -756,15 +745,15 @@ document.addEventListener("DOMContentLoaded", function() {
             labels: solarLabels,
             datasets: [
                 {
-                    label: 'Active Power (kW)',
+                    label: 'Solar Active Power (kW)',
                     data: solarPowerData,
-                    borderColor: '#F59E0B',
+                    borderColor: '#d97706',
                     backgroundColor: solarGradient,
-                    borderWidth: 3,
+                    borderWidth: 2,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#F59E0B',
-                    pointHoverRadius: 7,
+                    tension: 0.35,
+                    pointBackgroundColor: '#d97706',
+                    pointHoverRadius: 6,
                 }
             ]
         },
@@ -774,7 +763,7 @@ document.addEventListener("DOMContentLoaded", function() {
             plugins: {
                 legend: {
                     labels: {
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        color: getChartTextColor(),
                         font: { family: 'Outfit, Inter, sans-serif', size: 12, weight: '500' }
                     }
                 },
@@ -795,21 +784,46 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
+                    grid: { color: getChartGridColor() },
+                    ticks: { color: getChartTextColor(), font: { size: 10 } }
                 },
                 y: {
                     type: 'linear',
                     display: true,
                     min: 0,
                     max: 100,
-                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                    ticks: { color: 'rgba(245, 158, 11, 0.7)', font: { size: 10 } },
-                    title: { display: true, text: 'Active Power (kW)', color: 'rgba(245, 158, 11, 0.7)' }
+                    grid: { color: getChartGridColor() },
+                    ticks: { color: '#d97706', font: { size: 10 } },
+                    title: { display: true, text: 'Active Power (kW)', color: '#d97706' }
                 }
             }
         }
     });
+
+    // Observe theme attributes to adjust grid line and label colors in real-time
+    const themeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'data-theme') {
+                const newGridColor = getChartGridColor();
+                const newTextColor = getChartTextColor();
+                
+                // Redraw live telemetry chart
+                liveChart.options.plugins.legend.labels.color = newTextColor;
+                liveChart.options.scales.x.grid.color = newGridColor;
+                liveChart.options.scales.x.ticks.color = newTextColor;
+                liveChart.options.scales.y.grid.color = newGridColor;
+                liveChart.update();
+                
+                // Redraw live solar chart
+                solarChart.options.plugins.legend.labels.color = newTextColor;
+                solarChart.options.scales.x.grid.color = newGridColor;
+                solarChart.options.scales.x.ticks.color = newTextColor;
+                solarChart.options.scales.y.grid.color = newGridColor;
+                solarChart.update();
+            }
+        });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true });
 
     // 2. Main Live Data Polling Engine
     function fetchLiveData() {

@@ -171,17 +171,21 @@
             // 1. Temperature Chart
             const tempOptions = {
                 ...baseOptions,
-                colors: ['#ef4444'],
+                colors: ['#e11d48'],
                 series: [{
                     name: 'Temperature',
                     data: {!! json_encode($chartData['temperature']) !!}
                 }],
+                stroke: {
+                    curve: 'smooth',
+                    width: 2.5
+                },
                 fill: {
                     type: 'gradient',
                     gradient: {
                         shadeIntensity: 1,
-                        opacityFrom: 0.45,
-                        opacityTo: 0.05,
+                        opacityFrom: 0.12,
+                        opacityTo: 0.01,
                         stops: [0, 95]
                     }
                 },
@@ -195,17 +199,21 @@
             // 2. Humidity Chart
             const humOptions = {
                 ...baseOptions,
-                colors: ['#3b82f6'],
+                colors: ['#2563eb'],
                 series: [{
                     name: 'Humidity',
                     data: {!! json_encode($chartData['humidity']) !!}
                 }],
+                stroke: {
+                    curve: 'smooth',
+                    width: 2.5
+                },
                 fill: {
                     type: 'gradient',
                     gradient: {
                         shadeIntensity: 1,
-                        opacityFrom: 0.45,
-                        opacityTo: 0.05,
+                        opacityFrom: 0.12,
+                        opacityTo: 0.01,
                         stops: [0, 95]
                     }
                 },
@@ -220,12 +228,12 @@
             const pressOptions = {
                 ...baseOptions,
                 chart: { ...baseOptions.chart, type: 'line' },
-                colors: ['#06b6d4'],
+                colors: ['#0891b2'],
                 series: [{
                     name: 'Pressure',
                     data: {!! json_encode($chartData['pressure']) !!}
                 }],
-                stroke: { curve: 'smooth', width: 4 },
+                stroke: { curve: 'smooth', width: 2.5 },
                 yaxis: {
                     ...baseOptions.yaxis,
                     title: { text: 'Pressure (hPa)', style: { color: 'var(--text-secondary)' } }
@@ -237,12 +245,12 @@
             const batOptions = {
                 ...baseOptions,
                 chart: { ...baseOptions.chart, type: 'line' },
-                colors: ['#10b981'],
+                colors: ['#059669'],
                 series: [{
                     name: 'Battery Voltage',
                     data: {!! json_encode($chartData['battery']) !!}
                 }],
-                stroke: { curve: 'smooth', width: 3 },
+                stroke: { curve: 'smooth', width: 2.5 },
                 yaxis: {
                     ...baseOptions.yaxis,
                     title: { text: 'Voltage (V)', style: { color: 'var(--text-secondary)' } },
@@ -256,7 +264,7 @@
             const rssiOptions = {
                 ...baseOptions,
                 chart: { ...baseOptions.chart, height: 200, type: 'bar' },
-                colors: ['#f59e0b'],
+                colors: ['#d97706'],
                 series: [{
                     name: 'WiFi RSSI',
                     data: {!! json_encode($chartData['rssi']) !!}

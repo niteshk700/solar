@@ -10,69 +10,69 @@
     --font-heading: 'Outfit', 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
     
-    --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-    --mesh-color-1: rgba(99, 102, 241, 0.08);
-    --mesh-color-2: rgba(244, 63, 94, 0.08);
-    --mesh-color-3: rgba(16, 185, 129, 0.08);
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    --mesh-color-1: rgba(99, 102, 241, 0.02);
+    --mesh-color-2: rgba(244, 63, 94, 0.02);
+    --mesh-color-3: rgba(16, 185, 129, 0.02);
     
     --glass-bg: rgba(255, 255, 255, 0.45);
-    --glass-border: rgba(255, 255, 255, 0.6);
-    --glass-shadow: rgba(31, 38, 135, 0.05);
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-shadow: rgba(0, 0, 0, 0.02);
     
-    --card-bg: rgba(255, 255, 255, 0.65);
-    --card-border: rgba(255, 255, 255, 0.8);
-    --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(0, 0, 0, 0.06);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
     
     /* Brand & Accent Colors (Harmony-rich HSL) */
-    --primary: hsl(238, 83%, 62%);
-    --primary-glow: rgba(99, 102, 241, 0.3);
-    --secondary: hsl(340, 82%, 58%);
-    --accent: hsl(160, 84%, 39%);
-    --accent-glow: rgba(16, 185, 129, 0.2);
-    --warning: hsl(38, 92%, 50%);
-    --danger: hsl(0, 84%, 60%);
-    --info: hsl(199, 89%, 48%);
+    --primary: hsl(215, 80%, 45%);
+    --primary-glow: rgba(59, 130, 246, 0.1);
+    --secondary: hsl(215, 60%, 40%);
+    --accent: hsl(150, 60%, 35%);
+    --accent-glow: rgba(16, 185, 129, 0.1);
+    --warning: hsl(38, 85%, 45%);
+    --danger: hsl(0, 75%, 50%);
+    --info: hsl(200, 80%, 40%);
     
-    --sidebar-bg: rgba(255, 255, 255, 0.55);
-    --sidebar-border: rgba(255, 255, 255, 0.7);
-    --sidebar-active: rgba(99, 102, 241, 0.1);
+    --sidebar-bg: rgba(255, 255, 255, 0.6);
+    --sidebar-border: rgba(0, 0, 0, 0.06);
+    --sidebar-active: rgba(59, 130, 246, 0.06);
     
-    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    --blur-strength: 16px;
+    --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --blur-strength: 12px;
 }
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-    --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
-    --mesh-color-1: rgba(99, 102, 241, 0.15);
-    --mesh-color-2: rgba(244, 63, 94, 0.12);
-    --mesh-color-3: rgba(16, 185, 129, 0.12);
+    --bg-gradient: linear-gradient(135deg, #090d16 0%, #0f141f 100%);
+    --mesh-color-1: rgba(99, 102, 241, 0.04);
+    --mesh-color-2: rgba(244, 63, 94, 0.03);
+    --mesh-color-3: rgba(16, 185, 129, 0.03);
     
-    --glass-bg: rgba(17, 24, 39, 0.45);
-    --glass-border: rgba(255, 255, 255, 0.05);
-    --glass-shadow: rgba(0, 0, 0, 0.3);
+    --glass-bg: rgba(15, 23, 42, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.04);
+    --glass-shadow: rgba(0, 0, 0, 0.15);
     
-    --card-bg: rgba(24, 31, 48, 0.6);
-    --card-border: rgba(255, 255, 255, 0.06);
-    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --card-bg: rgba(21, 29, 45, 0.55);
+    --card-border: rgba(255, 255, 255, 0.05);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-muted: #64748b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
     
-    --primary: hsl(238, 85%, 66%);
-    --primary-glow: rgba(129, 140, 248, 0.3);
-    --secondary: hsl(340, 85%, 62%);
-    --accent: hsl(160, 84%, 45%);
-    --accent-glow: rgba(52, 211, 153, 0.2);
+    --primary: hsl(217, 85%, 60%);
+    --primary-glow: rgba(59, 130, 246, 0.15);
+    --secondary: hsl(217, 65%, 55%);
+    --accent: hsl(150, 70%, 45%);
+    --accent-glow: rgba(52, 211, 153, 0.1);
     
-    --sidebar-bg: rgba(17, 24, 39, 0.6);
-    --sidebar-border: rgba(255, 255, 255, 0.05);
-    --sidebar-active: rgba(129, 140, 248, 0.15);
+    --sidebar-bg: rgba(15, 23, 42, 0.6);
+    --sidebar-border: rgba(255, 255, 255, 0.04);
+    --sidebar-active: rgba(59, 130, 246, 0.08);
 }
 
 /* Base Reset & Background Mesh */
@@ -172,9 +172,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.12);
-    border-color: rgba(99, 102, 241, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Theme Toggle Button */
@@ -229,23 +229,17 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-brand-icon {
     width: 40px;
     height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 1.25rem;
-    box-shadow: 0 4px 15px var(--primary-glow);
 }
 
 .sidebar-brand-name {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 800;
-    background: linear-gradient(to right, var(--text-primary), var(--primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .sidebar-menu {
@@ -445,31 +439,32 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Premium Buttons styling */
 .btn-premium-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
-    border: none;
+    background: var(--primary);
+    border: 1px solid var(--primary);
     color: #fff;
     font-weight: 600;
-    box-shadow: 0 4px 15px var(--primary-glow);
     transition: var(--transition-smooth);
+    border-radius: 10px;
 }
 
 .btn-premium-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--primary-glow);
-    background: linear-gradient(135deg, #4f46e5 0%, var(--primary) 100%);
+    transform: translateY(-1px);
+    background: var(--secondary);
+    border-color: var(--secondary);
 }
 
 .btn-premium-secondary {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
-    font-weight: 600;
+    font-weight: 500;
     transition: var(--transition-smooth);
+    border-radius: 10px;
 }
 
 .btn-premium-secondary:hover {
-    transform: translateY(-2px);
-    background: rgba(100, 116, 139, 0.1);
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.08);
     color: var(--primary);
 }
 

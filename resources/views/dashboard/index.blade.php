@@ -172,24 +172,25 @@
 </div>
 
 <!-- Nitra Brand System Status Banner -->
-<div class="row mb-4 animate-fade-in">
+<div class="row mb-4">
     <div class="col-12">
-        <div class="glass-card p-3 border-0 d-flex flex-wrap align-items-center justify-content-between gap-3" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(245, 158, 11, 0.04)); border-left: 4px solid var(--warning) !important;">
+        <div class="glass-card p-3 border-0 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05) !important; border-radius: 12px;">
             <div class="d-flex align-items-center gap-3">
-                <div style="background: rgba(245, 158, 11, 0.1); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--warning);">
-                    <i class="fa-solid fa-graduation-cap" style="font-size: 1.25rem;"></i>
-                </div>
-                <div>
-                    <div class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">Nitra Technical Campus - Green Campus Initiative</div>
-                    <div class="text-secondary small" style="font-size: 0.78rem;">Rooftop Solar Telemetry Gateway & IoT Weather Analytics Node Network</div>
+                <i class="fa-solid fa-graduation-cap text-secondary" style="font-size: 1.1rem; opacity: 0.7;"></i>
+                <div class="text-start">
+                    <span class="text-white fw-semibold" style="font-size: 0.9rem; letter-spacing: 0.3px;">Nitra Technical Campus</span>
+                    <span class="text-muted mx-2 d-none d-sm-inline">•</span>
+                    <span class="text-secondary small d-block d-sm-inline" style="font-size: 0.78rem;">Green Campus Initiative Portal</span>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge form-control-glass text-success border-0 px-2.5 py-1.5 small fw-semibold" style="font-size: 0.72rem;">
-                    <span class="pulse-online me-1.5" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981;"></span>Secure Intranet
+            <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
+                <span class="badge form-control-glass text-secondary border-0 px-2.5 py-1.5 small fw-normal d-flex align-items-center gap-1.5" style="font-size: 0.72rem; opacity: 0.85;">
+                    <span class="pulse-online" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
+                    <span>Secure Intranet</span>
                 </span>
-                <span class="badge form-control-glass text-warning border-0 px-2.5 py-1.5 small fw-semibold" style="font-size: 0.72rem;">
-                    <i class="fa-solid fa-server me-1.5"></i>Live Gateway
+                <span class="badge form-control-glass text-secondary border-0 px-2.5 py-1.5 small fw-normal d-flex align-items-center gap-1.5" style="font-size: 0.72rem; opacity: 0.85;">
+                    <i class="fa-solid fa-server" style="font-size: 0.65rem;"></i>
+                    <span>Live Gateway</span>
                 </span>
             </div>
         </div>

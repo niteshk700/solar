@@ -218,18 +218,6 @@ class DashboardController extends Controller
 
             // The dates we want to export
             $dates = [
-                // 2023
-                '2023-05-22',
-                '2023-05-23',
-                '2023-05-24',
-                // 2024
-                '2024-05-22',
-                '2024-05-23',
-                '2024-05-24',
-                // 2025
-                '2025-05-22',
-                '2025-05-23',
-                '2025-05-24',
                 // 2026 (Live presentation dates)
                 '2026-05-20',
                 '2026-05-21',

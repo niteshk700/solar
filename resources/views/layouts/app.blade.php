@@ -123,7 +123,10 @@
             <button class="mobile-nav-toggle" id="sidebarToggleMobile" aria-label="Toggle Sidebar">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <div class="sidebar-brand-name" style="font-size: 1.1rem; margin: 0;">Solar Weather</div>
+            <div class="d-flex align-items-center gap-2" style="margin: 0;">
+                <img src="/icons/icon-32.png" alt="Solar Weather Logo" style="width: 26px; height: 26px; border-radius: 7px;">
+                <span class="sidebar-brand-name" style="font-size: 1.05rem; margin: 0;">Solar Weather</span>
+            </div>
             <button class="theme-toggle-btn" id="themeToggleBtnMobile" aria-label="Toggle Dark Mode">
                 <i class="fa-solid fa-moon"></i>
             </button>
@@ -132,8 +135,9 @@
         <!-- 2. Responsive Sidebar -->
         <aside class="sidebar" id="sidebarLayout">
             <a href="{{ route('dashboard') }}" class="sidebar-brand">
-                <div class="sidebar-brand-icon">
-                    <i class="fa-solid fa-solar-panel"></i>
+                <div class="sidebar-brand-icon" style="background: transparent; padding: 0; overflow: visible;">
+                    <img src="/icons/icon-96.png" alt="Solar Weather Logo"
+                         style="width: 40px; height: 40px; border-radius: 10px; object-fit: cover; display: block;">
                 </div>
                 <span class="sidebar-brand-name">Solar Weather</span>
             </a>

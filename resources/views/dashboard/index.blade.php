@@ -3,14 +3,75 @@
 @section('title', 'Control Center - Solar IoT Weather Platform')
 
 @section('content')
+<style>
+/* Sleek glassmorphic card refinements & animations */
+.glass-card {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+}
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-25deg);
+    transition: 0.75s;
+}
+.glass-card:hover::before {
+    left: 150%;
+}
+.glass-card:hover {
+    transform: translateY(-4px) scale(1.008);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 0 1px rgba(255, 255, 255, 0.25) !important;
+}
+/* Neon status pulses */
+.pulse-online {
+    background: #10B981 !important;
+    box-shadow: 0 0 10px #10B981;
+}
+.pulse-offline {
+    background: #EF4444 !important;
+    box-shadow: 0 0 10px #EF4444;
+}
+/* Value update flash cues */
+@keyframes pop-flash {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.08); filter: brightness(1.4); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+.flash-update {
+    animation: pop-flash 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-block;
+}
+/* Interactive chart override */
+#liveTelemetryChart {
+    filter: drop-shadow(0px 8px 24px rgba(59, 130, 246, 0.1));
+}
+.chart-card {
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+</style>
+
 <!-- Page Header -->
 <div class="content-header">
     <div>
         <h2 class="content-title">Control Center Dashboard</h2>
         <p class="content-subtitle">Real-time solar telemetry and environmental insights</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2">
+    <div class="d-flex flex-wrap gap-2">
+        <button id="btn-force-sync" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
+            <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
+            <span>Force Sync</span>
+        </button>
+        <a href="{{ route('dashboard.export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
+            <i class="fa-solid fa-file-csv text-success"></i>
+            <span>Export Excel</span>
+        </a>
+        <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
             <i class="fa-solid fa-plus"></i>
             <span>Manage Devices</span>
         </a>
@@ -84,6 +145,26 @@
 </div>
 
 <div class="row">
+    <!-- Live Telemetry Stream Chart -->
+    <div class="col-12 mb-4">
+        <div class="glass-card p-4 chart-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <h3 class="h5 font-heading fw-bold m-0 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-primary"></i>
+                    <span>Real-Time Environmental Stream</span>
+                </h3>
+                <div>
+                    <span class="badge form-control-glass text-secondary px-2.5 py-1.5 small" id="chart-pulse-badge">
+                        <span class="pulse-online me-1.5" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%;"></span>LIVE STREAMING
+                    </span>
+                </div>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="liveTelemetryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Active Solar Nodes Grid -->
     <div class="col-xl-8 col-lg-12 mb-4">
         <h3 class="h5 font-heading fw-bold mb-3 d-flex align-items-center gap-2">
@@ -305,33 +386,163 @@
     </div>
 </div>
 
-<!-- Vanilla JS AJAX Polling Engine -->
+<!-- Import Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Modern AJAX Polling & Charting Engine -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const liveUrl = "{{ route('dashboard.live') }}";
     
+    // Helper to trigger micro-animation flashes on value changes
+    function updateAnimatedValue(el, newValue) {
+        if (!el) return;
+        if (el.innerText !== newValue) {
+            el.innerText = newValue;
+            el.classList.remove('flash-update');
+            void el.offsetWidth; // Trigger reflow to restart animation
+            el.classList.add('flash-update');
+        }
+    }
+
+    // Helper to trigger micro-animation HTML updates
+    function updateAnimatedHtml(el, newHtml) {
+        if (!el) return;
+        if (el.innerHTML !== newHtml) {
+            el.innerHTML = newHtml;
+            el.classList.remove('flash-update');
+            void el.offsetWidth; // Trigger reflow
+            el.classList.add('flash-update');
+        }
+    }
+
+    // 1. Setup Chart.js Telemetry Monitor
+    const ctx = document.getElementById('liveTelemetryChart').getContext('2d');
+    
+    // Neon Red Gradient for Temperature
+    const tempGradient = ctx.createLinearGradient(0, 0, 0, 300);
+    tempGradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+    tempGradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+    
+    // Primary Blue Gradient for Humidity
+    const humGradient = ctx.createLinearGradient(0, 0, 0, 300);
+    humGradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+    humGradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+    
+    // Load initial weather packets from blade loop
+    const initialLogs = @json($recentLogs->reverse()->values());
+    const labels = [];
+    const tempData = [];
+    const humData = [];
+    
+    initialLogs.forEach(log => {
+        labels.push(new Date(log.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}));
+        tempData.push(log.temperature);
+        humData.push(log.humidity);
+    });
+
+    let lastTimestamp = initialLogs.length > 0 ? initialLogs[initialLogs.length - 1].created_at : null;
+
+    const liveChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Temperature (°C)',
+                    data: tempData,
+                    borderColor: '#EF4444',
+                    backgroundColor: tempGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#EF4444',
+                    pointHoverRadius: 7,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Humidity (%)',
+                    data: humData,
+                    borderColor: '#3B82F6',
+                    backgroundColor: humGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3B82F6',
+                    pointHoverRadius: 7,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: { family: 'Outfit, Inter, sans-serif', size: 12, weight: '500' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    padding: 10
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                    ticks: { color: 'rgba(239, 68, 68, 0.7)', font: { size: 10 } },
+                    title: { display: true, text: 'Temperature (°C)', color: 'rgba(239, 68, 68, 0.7)' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: 'rgba(59, 130, 246, 0.7)', font: { size: 10 } },
+                    title: { display: true, text: 'Humidity (%)', color: 'rgba(59, 130, 246, 0.7)' }
+                }
+            }
+        }
+    });
+
+    // 2. Main Live Data Polling Engine
     function fetchLiveData() {
         fetch(liveUrl)
             .then(response => response.json())
             .then(data => {
-                // 1. Update overall aggregated metrics
                 const stats = data.stats;
                 
-                document.getElementById('avg-temp').innerText = stats.avg_temp !== null ? stats.avg_temp + '°C' : '--';
-                document.getElementById('avg-hum').innerText = stats.avg_hum !== null ? stats.avg_hum + '%' : '--';
-                document.getElementById('avg-press').innerText = stats.avg_press !== null ? Math.round(stats.avg_press) + ' hPa' : '--';
+                // Update overall aggregated metrics
+                updateAnimatedValue(document.getElementById('avg-temp'), stats.avg_temp !== null ? stats.avg_temp + '°C' : '--');
+                updateAnimatedValue(document.getElementById('avg-hum'), stats.avg_hum !== null ? stats.avg_hum + '%' : '--');
+                updateAnimatedValue(document.getElementById('avg-press'), stats.avg_press !== null ? Math.round(stats.avg_press) + ' hPa' : '--');
                 
                 const avgBatteryEl = document.getElementById('avg-battery');
-                if (stats.avg_battery !== null) {
+                if (avgBatteryEl && stats.avg_battery !== null) {
                     const batVal = parseFloat(stats.avg_battery);
                     let batPct = 0;
                     if (batVal >= 4.2) batPct = 100;
                     else if (batVal <= 3.5) batPct = 0;
                     else batPct = Math.round(((batVal - 3.5) / 0.7) * 100);
                     
-                    avgBatteryEl.innerHTML = `${batVal}V <span style="font-size: 0.95rem; font-weight: 500;" class="text-secondary">(${batPct}%)</span>`;
-                } else {
-                    avgBatteryEl.innerText = '--';
+                    const newHtml = `${batVal}V <span style="font-size: 0.95rem; font-weight: 500;" class="text-secondary">(${batPct}%)</span>`;
+                    updateAnimatedHtml(avgBatteryEl, newHtml);
+                } else if (avgBatteryEl) {
+                    updateAnimatedValue(avgBatteryEl, '--');
                 }
 
                 // Update total registered device count title
@@ -340,7 +551,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     headerCount.innerText = `Registered Hardware Nodes (${stats.total_devices})`;
                 }
 
-                // 2. Update individual device cards
+                // Update individual device cards
                 data.devices.forEach(device => {
                     const card = document.getElementById(`device-card-${device.device_id}`);
                     if (!card) return;
@@ -348,10 +559,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Update online/offline badge
                     const badgeContainer = card.querySelector('.dev-online-badge');
                     if (badgeContainer) {
-                        if (device.is_online) {
-                            badgeContainer.innerHTML = `<span class="pulse-online"></span><span class="text-secondary small fw-semibold">ONLINE</span>`;
-                        } else {
-                            badgeContainer.innerHTML = `<span class="pulse-offline"></span><span class="text-muted small fw-semibold">OFFLINE</span>`;
+                        const expectedHtml = device.is_online 
+                            ? `<span class="pulse-online"></span><span class="text-secondary small fw-semibold">ONLINE</span>`
+                            : `<span class="pulse-offline"></span><span class="text-muted small fw-semibold">OFFLINE</span>`;
+                        if (badgeContainer.innerHTML !== expectedHtml) {
+                            badgeContainer.innerHTML = expectedHtml;
                         }
                     }
 
@@ -360,21 +572,23 @@ document.addEventListener("DOMContentLoaded", function() {
                     const telemetryBody = card.querySelector('.dev-telemetry-body');
                     
                     if (log && telemetryBody) {
-                        // If it previously had no logs (empty status warning), reload the page to initialize layout cleanly
+                        // Refresh logic if card previously had empty warning
                         if (telemetryBody.querySelector('.text-center.my-5')) {
                             window.location.reload(); 
                             return;
                         }
 
-                        // Temp, Hum, Press
+                        // Temperature
                         const tempEl = card.querySelector('.dev-temp');
-                        if (tempEl) tempEl.innerText = log.temperature !== null ? log.temperature + '°C' : '--';
+                        updateAnimatedValue(tempEl, log.temperature !== null ? log.temperature + '°C' : '--');
 
+                        // Humidity
                         const humEl = card.querySelector('.dev-hum');
-                        if (humEl) humEl.innerText = log.humidity !== null ? log.humidity + '%' : '--';
+                        updateAnimatedValue(humEl, log.humidity !== null ? log.humidity + '%' : '--');
 
+                        // Pressure
                         const pressEl = card.querySelector('.dev-press');
-                        if (pressEl) pressEl.innerText = log.pressure !== null ? Math.round(log.pressure) + ' hPa' : '--';
+                        updateAnimatedValue(pressEl, log.pressure !== null ? Math.round(log.pressure) + ' hPa' : '--');
 
                         // Battery
                         const batVal = parseFloat(log.battery) || 0;
@@ -391,7 +605,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (batLabel) batLabel.innerText = `Battery (${batVal.toFixed(2)}V)`;
 
                         const batPctEl = card.querySelector('.dev-battery-pct');
-                        if (batPctEl) batPctEl.innerText = `${batPct}%`;
+                        updateAnimatedValue(batPctEl, `${batPct}%`);
 
                         const batFill = card.querySelector('.dev-battery-fill');
                         if (batFill) {
@@ -399,7 +613,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             batFill.style.background = batColor;
                         }
 
-                        // RSSI
+                        // RSSI Signal Strength
                         const rssiVal = parseInt(log.rssi) || 0;
                         let rssiLabel = 'Excellent';
                         let rssiColor = 'var(--accent)';
@@ -412,7 +626,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (rssiLabelEl) rssiLabelEl.innerText = `Signal RSSI (${rssiVal} dBm)`;
 
                         const rssiStatus = card.querySelector('.dev-rssi-status');
-                        if (rssiStatus) {
+                        if (rssiStatus && rssiStatus.innerText !== rssiLabel) {
                             rssiStatus.innerText = rssiLabel;
                             rssiStatus.style.color = rssiColor;
                         }
@@ -423,47 +637,45 @@ document.addEventListener("DOMContentLoaded", function() {
                             rssiFill.style.background = rssiColor;
                         }
 
-                        // BME280 Sensor Status
+                        // Component Statuses
                         const bmeBadge = card.querySelector('.dev-bme-badge');
                         if (bmeBadge) {
-                            if (log.bme_status) {
-                                bmeBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`;
-                            } else {
-                                bmeBadge.innerHTML = `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
-                            }
+                            const expectedBme = log.bme_status 
+                                ? `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`
+                                : `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
+                            if (bmeBadge.innerHTML !== expectedBme) bmeBadge.innerHTML = expectedBme;
                         }
 
-                        // DHT11 Sensor Status
                         const dhtBadge = card.querySelector('.dev-dht-badge');
                         if (dhtBadge) {
-                            if (log.dht_status !== false) {
-                                dhtBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`;
-                            } else {
-                                dhtBadge.innerHTML = `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
-                            }
+                            const expectedDht = log.dht_status !== false
+                                ? `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`
+                                : `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
+                            if (dhtBadge.innerHTML !== expectedDht) dhtBadge.innerHTML = expectedDht;
                         }
 
-                        // Solar Status Badge
                         const solarBadge = card.querySelector('.dev-solar-badge');
                         if (solarBadge) {
+                            let expectedSolar = '';
                             if (log.solar_status === 'charging') {
-                                solarBadge.innerHTML = `<span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>`;
+                                expectedSolar = `<span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>`;
                             } else if (log.solar_status === 'full') {
-                                solarBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>`;
+                                expectedSolar = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>`;
                             } else {
-                                solarBadge.innerHTML = `<span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>`;
+                                expectedSolar = `<span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>`;
                             }
+                            if (solarBadge.innerHTML !== expectedSolar) solarBadge.innerHTML = expectedSolar;
                         }
                     }
 
-                    // Update relative timestamp text
+                    // Update relative timestamp
                     const lastSeenEl = card.querySelector('.dev-last-seen');
                     if (lastSeenEl) {
                         lastSeenEl.innerHTML = `<i class="fa-regular fa-clock me-1"></i> ${device.last_seen_human}`;
                     }
                 });
 
-                // 3. Update Live Packet Stream
+                // Update Live Packet Stream Panel
                 const packetStream = document.getElementById('live-packet-stream');
                 if (packetStream && data.recentLogs.length > 0) {
                     let htmlContent = '';
@@ -494,12 +706,55 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                     packetStream.innerHTML = htmlContent;
                 }
+
+                // Append new points to live scrolling trend chart if new packet received
+                if (data.recentLogs.length > 0) {
+                    const newestLog = data.recentLogs[0];
+                    if (newestLog.created_at !== lastTimestamp) {
+                        lastTimestamp = newestLog.created_at;
+                        
+                        const timeLabel = new Date(newestLog.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                        
+                        liveChart.data.labels.push(timeLabel);
+                        liveChart.data.datasets[0].data.push(newestLog.temperature);
+                        liveChart.data.datasets[1].data.push(newestLog.humidity);
+                        
+                        // Keep a max viewport of 15 samples rolling dynamically
+                        if (liveChart.data.labels.length > 15) {
+                            liveChart.data.labels.shift();
+                            liveChart.data.datasets[0].data.shift();
+                            liveChart.data.datasets[1].data.shift();
+                        }
+                        
+                        liveChart.update('none'); // smooth updates
+                    }
+                }
             })
             .catch(err => console.error("Error fetching live weather dashboard aggregates: ", err));
     }
     
-    // Poll every 3 seconds
+    // Poll every 3 seconds for aggregates & charts
     setInterval(fetchLiveData, 3000);
+
+    // 3. Setup Force Sync Action Handlers
+    const forceSyncBtn = document.getElementById('btn-force-sync');
+    const syncIcon = document.getElementById('sync-icon');
+    
+    if (forceSyncBtn && syncIcon) {
+        forceSyncBtn.addEventListener('click', function() {
+            syncIcon.classList.add('fa-spin');
+            forceSyncBtn.disabled = true;
+            forceSyncBtn.querySelector('span').innerText = 'Syncing...';
+            
+            fetchLiveData();
+            
+            setTimeout(() => {
+                syncIcon.classList.remove('fa-spin');
+                forceSyncBtn.disabled = false;
+                forceSyncBtn.querySelector('span').innerText = 'Force Sync';
+            }, 1000);
+        });
+    }
 });
 </script>
 @endsection

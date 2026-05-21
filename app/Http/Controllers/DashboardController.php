@@ -106,4 +106,71 @@ class DashboardController extends Controller
 
         return compact('devices', 'stats', 'recentLogs');
     }
+
+    /**
+     * Stream weather logs as a high-performance CSV download.
+     */
+    public function export(Request $request)
+    {
+        $fileName = 'weather_telemetry_export_' . date('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $devices = Device::all();
+        
+        $callback = function() use($devices) {
+            $file = fopen('php://output', 'w');
+            
+            // Write CSV UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // Header Row
+            fputcsv($file, [
+                'Timestamp', 
+                'Device ID', 
+                'Device Name', 
+                'Temperature (C)', 
+                'Humidity (%)', 
+                'Pressure (hPa)', 
+                'Battery (V)', 
+                'Signal RSSI (dBm)', 
+                'BME280 Status', 
+                'DHT11 Status', 
+                'Solar Status'
+            ]);
+
+            // Chunked queries prevent memory limits from blowing up on huge datasets
+            WeatherLog::orderBy('created_at', 'desc')
+                ->chunk(200, function($logs) use($file, $devices) {
+                    foreach ($logs as $log) {
+                        $dev = $devices->firstWhere('device_id', $log->device_id);
+                        $deviceName = $dev ? $dev->device_name : 'Unknown Device';
+                        
+                        fputcsv($file, [
+                            $log->created_at->format('Y-m-d H:i:s'),
+                            $log->device_id,
+                            $deviceName,
+                            !is_null($log->temperature) ? number_format($log->temperature, 1) : 'N/A',
+                            !is_null($log->humidity) ? number_format($log->humidity, 1) : 'N/A',
+                            !is_null($log->pressure) ? number_format($log->pressure, 1) : 'N/A',
+                            !is_null($log->battery) ? number_format($log->battery, 2) : 'N/A',
+                            !is_null($log->rssi) ? $log->rssi : 'N/A',
+                            $log->bme_status ? 'CONNECTED' : 'OFFLINE',
+                            (isset($log->dht_status) && !$log->dht_status) ? 'OFFLINE' : 'CONNECTED',
+                            strtoupper($log->solar_status ?: 'IDLE')
+                        ]);
+                    }
+                });
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

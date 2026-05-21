@@ -11,8 +11,8 @@
  *    [BME280 Pin]      --->  [NodeMCU Pin]   --->  [Description]
  *    VCC               --->  3V3             --->  Power Supply (3.3V)
  *    GND               --->  GND             --->  System Ground
- *    SCL               --->  D1 (GPIO 5)     --->  I2C Clock Line
- *    SDA               --->  D2 (GPIO 4)     --->  I2C Data Line
+ *    SCL               --->  D4 (GPIO 2)     --->  I2C Clock Line
+ *    SDA               --->  D3 (GPIO 0)     --->  I2C Data Line
  * 
  * 2. DHT11 Environmental Sensor (Single-bus - Secondary Backup Sensor)
  *    [DHT11 Pin]       --->  [NodeMCU Pin]   --->  [Description]
@@ -99,8 +99,8 @@ void setup() {
   pinMode(PIN_TP4056_STDBY, INPUT_PULLUP);
 
   // 2. Initialize BME280 Environmental Sensor (I2C Primary)
-  Serial.println("Probing I2C bus for BME280...");
-  Wire.begin(4, 5); // SDA = GPIO 4 (D2), SCL = GPIO 5 (D1)
+  Serial.println("Probing I2C bus for BME280 on pins D3 (SDA) and D4 (SCL)...");
+  Wire.begin(0, 2); // SDA = GPIO 0 (D3), SCL = GPIO 2 (D4)
   if (bme.begin(0x76) || bme.begin(0x77)) {
     bmeConnected = true;
     Serial.println("BME280 Environmental Sensor successfully initialized!");

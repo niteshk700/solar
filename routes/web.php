@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard Home
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/live', [DashboardController::class, 'liveData'])->name('dashboard.live');
 
     // Device Management CRUD
     Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');

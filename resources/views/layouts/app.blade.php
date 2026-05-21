@@ -135,11 +135,14 @@
         <!-- 2. Responsive Sidebar -->
         <aside class="sidebar" id="sidebarLayout">
             <a href="{{ route('dashboard') }}" class="sidebar-brand">
-                <div class="sidebar-brand-icon" style="background: transparent; padding: 0; overflow: visible;">
-                    <img src="/icons/icon-96.png" alt="Solar Weather Logo"
-                         style="width: 40px; height: 40px; border-radius: 10px; object-fit: cover; display: block;">
+                <div class="sidebar-brand-icon" style="background: #ffffff; padding: 3px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    <img src="https://nitra.ac.in/wp-content/uploads/2024/08/cropped-cropped-Untitled-design-7.png" alt="Nitra Logo"
+                         style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
                 </div>
-                <span class="sidebar-brand-name">Solar Weather</span>
+                <span class="sidebar-brand-name" style="font-size: 0.85rem; line-height: 1.2; text-align: left;">
+                    Nitra Campus<br>
+                    <span class="text-warning" style="font-size: 0.72rem; font-weight: 600;">Solar Portal</span>
+                </span>
             </a>
 
             <nav class="sidebar-menu-wrapper">

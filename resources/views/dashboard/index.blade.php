@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Control Center - Solar IoT Weather Platform')
+@section('title', 'Control Center - Nitra Campus Solar IoT Portal')
 
 @section('content')
 <style>
@@ -143,8 +143,13 @@
 <!-- Page Header -->
 <div class="content-header">
     <div>
-        <h2 class="content-title">Control Center Dashboard</h2>
-        <p class="content-subtitle">Real-time solar telemetry and environmental insights</p>
+        <h2 class="content-title d-flex flex-wrap align-items-center gap-2">
+            <span>Control Center Dashboard</span>
+            <span class="badge bg-warning text-dark font-heading fw-bold" style="font-size: 0.65rem; border-radius: 6px; padding: 4px 8px; vertical-align: middle;">
+                NITRA TECHNICAL CAMPUS
+            </span>
+        </h2>
+        <p class="content-subtitle">Real-time solar telemetry and environmental insights from Nitra Campus</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <button id="btn-force-sync" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">

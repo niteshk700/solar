@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Solar Weather Platform</title>
+    <title>Login - Nitra Campus Solar Weather Portal</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome 6 Icons -->
@@ -31,11 +31,12 @@
         <div class="glass-card login-card">
             <!-- Brand header -->
             <div class="text-center mb-4">
-                <div class="sidebar-brand-icon mx-auto mb-3" style="width: 50px; height: 50px; border-radius: 12px; font-size: 1.5rem;">
-                    <i class="fa-solid fa-solar-panel"></i>
+                <div class="sidebar-brand-icon mx-auto mb-3" style="background: #ffffff; padding: 4px; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <img src="https://nitra.ac.in/wp-content/uploads/2024/08/cropped-cropped-Untitled-design-7.png" alt="Nitra Logo"
+                         style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
                 </div>
-                <h1 class="h3 font-heading fw-extrabold mb-1">Solar Weather</h1>
-                <p class="text-secondary small">Environmental Analytics Control Center</p>
+                <h1 class="h3 font-heading fw-extrabold mb-1 text-primary">Nitra Campus</h1>
+                <p class="text-warning fw-semibold small">Solar IoT Weather Portal</p>
             </div>
 
             <!-- Login Form -->

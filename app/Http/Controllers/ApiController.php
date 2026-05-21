@@ -27,6 +27,7 @@ class ApiController extends Controller
             'battery' => 'nullable|numeric|between:0,6',
             'rssi' => 'nullable|integer|between:-150,0',
             'bme_status' => 'nullable|boolean',
+            'dht_status' => 'nullable|boolean',
             'solar_status' => 'nullable|string|in:idle,charging,full',
         ]);
 
@@ -73,6 +74,7 @@ class ApiController extends Controller
             'battery' => $validated['battery'] ?? null,
             'rssi' => $validated['rssi'] ?? null,
             'bme_status' => $validated['bme_status'] ?? true,
+            'dht_status' => $validated['dht_status'] ?? true,
             'solar_status' => $validated['solar_status'] ?? 'idle',
         ]);
 

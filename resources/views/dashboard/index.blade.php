@@ -190,29 +190,42 @@
                                         <span class="text-secondary small fw-semibold uppercase tracking-wider d-block mb-2" style="font-size: 0.75rem;">Component Statuses</span>
                                         <div class="row g-2">
                                             <!-- BME280 Status -->
-                                            <div class="col-6">
-                                                <div class="p-2 form-control-glass d-flex align-items-center justify-content-between border-0" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05);">
-                                                    <span class="text-secondary small" style="font-size: 0.68rem; font-weight: 500;">BME280 Sensor</span>
+                                            <div class="col-4">
+                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center border-0 text-center" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05); min-height: 52px;">
+                                                    <span class="text-secondary small mb-1" style="font-size: 0.6rem; font-weight: 500;">BME280</span>
                                                     <span class="dev-bme-badge">
                                                         @if($device->latest_log->bme_status)
-                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;">OK</span>
+                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>
                                                         @else
-                                                            <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>
+                                                            <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <!-- DHT11 Status -->
+                                            <div class="col-4">
+                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center border-0 text-center" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05); min-height: 52px;">
+                                                    <span class="text-secondary small mb-1" style="font-size: 0.6rem; font-weight: 500;">DHT11</span>
+                                                    <span class="dev-dht-badge">
+                                                        @if(isset($device->latest_log->dht_status) ? $device->latest_log->dht_status : true)
+                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>
+                                                        @else
+                                                            <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>
                                                         @endif
                                                     </span>
                                                 </div>
                                             </div>
                                             <!-- Charger State (TP4056 + Solar) -->
-                                            <div class="col-6">
-                                                <div class="p-2 form-control-glass d-flex align-items-center justify-content-between border-0" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05);">
-                                                    <span class="text-secondary small" style="font-size: 0.68rem; font-weight: 500;">Solar Charger</span>
+                                            <div class="col-4">
+                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center border-0 text-center" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05); min-height: 52px;">
+                                                    <span class="text-secondary small mb-1" style="font-size: 0.6rem; font-weight: 500;">Solar</span>
                                                     <span class="dev-solar-badge">
                                                         @if($device->latest_log->solar_status === 'charging')
-                                                            <span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.55rem;"></i>CHARGING</span>
+                                                            <span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>
                                                         @elseif($device->latest_log->solar_status === 'full')
-                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.55rem;"></i>FULL</span>
+                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>
                                                         @else
-                                                            <span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.55rem;"></i>IDLE</span>
+                                                            <span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>
                                                         @endif
                                                     </span>
                                                 </div>
@@ -414,9 +427,19 @@ document.addEventListener("DOMContentLoaded", function() {
                         const bmeBadge = card.querySelector('.dev-bme-badge');
                         if (bmeBadge) {
                             if (log.bme_status) {
-                                bmeBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;">OK</span>`;
+                                bmeBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`;
                             } else {
-                                bmeBadge.innerHTML = `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
+                                bmeBadge.innerHTML = `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
+                            }
+                        }
+
+                        // DHT11 Sensor Status
+                        const dhtBadge = card.querySelector('.dev-dht-badge');
+                        if (dhtBadge) {
+                            if (log.dht_status !== false) {
+                                dhtBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`;
+                            } else {
+                                dhtBadge.innerHTML = `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
                             }
                         }
 
@@ -424,11 +447,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         const solarBadge = card.querySelector('.dev-solar-badge');
                         if (solarBadge) {
                             if (log.solar_status === 'charging') {
-                                solarBadge.innerHTML = `<span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.55rem;"></i>CHARGING</span>`;
+                                solarBadge.innerHTML = `<span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>`;
                             } else if (log.solar_status === 'full') {
-                                solarBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.55rem;"></i>FULL</span>`;
+                                solarBadge.innerHTML = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>`;
                             } else {
-                                solarBadge.innerHTML = `<span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.6rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.55rem;"></i>IDLE</span>`;
+                                solarBadge.innerHTML = `<span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>`;
                             }
                         }
                     }

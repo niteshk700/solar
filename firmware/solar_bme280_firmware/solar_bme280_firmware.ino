@@ -1,20 +1,26 @@
 /**
  * ==========================================================================
- * SOLAR-POWERED ESP8266 + BME280 + TP4056 WEATHER STATION FIRMWARE
- * WITH REAL-TIME COMPONENT DIAGNOSTICS & CAPTIVE PORTAL CONFIGURATION
+ * SOLAR-POWERED ESP8266 + BME280 + DHT11 DUAL-SENSOR WEATHER PLATFORM sketch
+ * WITH INTEGRATED COMPONENT-LEVEL FAILOVER REDUNDANCY & DUAL DIAGNOSTICS
  * ==========================================================================
  * 
- * 🛠️ DETAILED SOLDERING & WIRING CONNECTION SCHEMATIC
+ * 🛠️ DUAL-SENSOR SOLDERING & WIRING CONNECTION SCHEMATIC
  * --------------------------------------------------------------------------
  * 
- * 1. BME280 Sensor (I2C)
+ * 1. BME280 Environmental Sensor (I2C Mode - Primary Sensor)
  *    [BME280 Pin]      --->  [NodeMCU Pin]   --->  [Description]
  *    VCC               --->  3V3             --->  Power Supply (3.3V)
  *    GND               --->  GND             --->  System Ground
  *    SCL               --->  D1 (GPIO 5)     --->  I2C Clock Line
  *    SDA               --->  D2 (GPIO 4)     --->  I2C Data Line
  * 
- * 2. TP4056 Solar Charger Module
+ * 2. DHT11 Environmental Sensor (Single-bus - Secondary Backup Sensor)
+ *    [DHT11 Pin]       --->  [NodeMCU Pin]   --->  [Description]
+ *    VCC               --->  3V3             --->  Power Supply (3.3V)
+ *    GND               --->  GND             --->  System Ground
+ *    DATA              --->  D4 (GPIO 2)     --->  Digital Sensor Data Bus
+ * 
+ * 3. TP4056 Solar Charger Module
  *    [TP4056 Pin]      --->  [Connection]    --->  [Description]
  *    IN+               --->  Solar Panel (+) --->  Positive Input from 3W Solar Panel
  *    IN-               --->  Solar Panel (-) --->  Negative Input from 3W Solar Panel
@@ -25,13 +31,12 @@
  *    CHRG (Pin 7 LED)  --->  NodeMCU D5      --->  Low when actively Charging (GPIO 14)
  *    STDBY (Pin 6 LED) --->  NodeMCU D6      --->  Low when battery is fully Charged (GPIO 12)
  * 
- * 3. 18650 Battery Monitoring Divider Circuit (A0 Pin)
+ * 4. 18650 Battery Monitoring Divider Circuit (A0 Pin)
  *    To read high battery voltages (3.0V - 4.2V) on the analog input safely:
  *    [Battery Positive (+)] -> [ 220k Ohm Resistor ] -> A0 -> [ 100k Ohm Resistor ] -> [Common GND (-)]
  *    - This scales a max battery voltage of 4.2V down to ~1.31V.
- *    - The NodeMCU board has an internal 220k/100k divider, mapping this to the raw ESP8266 ADC.
  * 
- * 4. Deep Sleep Hardware Wakeup Jumper
+ * 5. Deep Sleep Hardware Wakeup Jumper
  *    [NodeMCU Pin]      --->  [NodeMCU Pin]   --->  [Description]
  *    D0 (GPIO 16)      --->  RST             --->  Physically jumpered to wake up ESP8266
  *    ⚠️ WARNING: Disconnect this jumper wire while flashing/uploading code via USB!
@@ -43,14 +48,17 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
 #include <ArduinoJson.h>
 
 // Required libraries for WiFi Captive Portal Config
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h> // Library: "WiFiManager" by tzapu
+
+// Include both sensor libraries concurrently
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+#include <DHT.h>
 
 // ================= USER CONFIGURATION =================
 // Device Registration Details (Must match Laravel Device Management)
@@ -72,8 +80,14 @@ const int PIN_TP4056_CHRG  = 14; // D5 on NodeMCU (GPIO 14)
 const int PIN_TP4056_STDBY = 12; // D6 on NodeMCU (GPIO 12)
 // ======================================================
 
+// Instantiate sensor drivers globally
 Adafruit_BME280 bme; // I2C Mode
+#define DHTPIN 2     // D4 on NodeMCU is GPIO 2
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
 bool bmeConnected = false;
+bool dhtConnected = false;
 
 void setup() {
   Serial.begin(115200);
@@ -84,27 +98,48 @@ void setup() {
   pinMode(PIN_TP4056_CHRG, INPUT_PULLUP);
   pinMode(PIN_TP4056_STDBY, INPUT_PULLUP);
 
-  // 2. Initialize the I2C Bus on pins D2 (SDA/4) and D1 (SCL/5) explicitly
+  // 2. Initialize BME280 Environmental Sensor (I2C Primary)
+  Serial.println("Probing I2C bus for BME280...");
   Wire.begin(4, 5); // SDA = GPIO 4 (D2), SCL = GPIO 5 (D1)
-
-  // 3. Initialize BME280 Sensor (Auto-detecting 0x76 and 0x77 addresses)
   if (bme.begin(0x76) || bme.begin(0x77)) {
     bmeConnected = true;
     Serial.println("BME280 Environmental Sensor successfully initialized!");
   } else {
-    Serial.println("WARNING: Could not find a valid BME280 sensor, check soldering!");
-    // We will still proceed to transmit battery status even if sensor fails
+    Serial.println("WARNING: BME280 Sensor not found, check soldering!");
   }
 
-  // 3. Read Sensors immediately (minimize active power draw before radio starts)
+  // 3. Initialize DHT11 Sensor (Backup / Secondary)
+  Serial.println("Initializing DHT11 on pin D4...");
+  dht.begin();
+  
+  // Try reading DHT11 to check if physically present
+  float checkT = dht.readTemperature();
+  if (!isnan(checkT)) {
+    dhtConnected = true;
+    Serial.println("DHT11 Environmental Sensor successfully initialized!");
+  } else {
+    Serial.println("WARNING: DHT11 Sensor not found, check wiring!");
+  }
+
+  // 4. Read Meteorological Metrics (Executing dynamic BME280 ➔ DHT11 Failover Logic)
   float temperature = NAN;
   float humidity    = NAN;
   float pressure    = NAN;
 
   if (bmeConnected) {
+    // Primary reading from high-accuracy BME280 sensor
     temperature = bme.readTemperature();
     humidity    = bme.readHumidity();
     pressure    = bme.readPressure() / 100.0F; // Convert Pa to hPa
+    Serial.println("Environmental Data sourced from: BME280 (Primary)");
+  } else if (dhtConnected) {
+    // Failover reading from secondary DHT11 sensor
+    temperature = dht.readTemperature();
+    humidity    = dht.readHumidity();
+    pressure    = NAN; // DHT11 does not measure pressure
+    Serial.println("Environmental Data sourced from: DHT11 (Backup Failover)");
+  } else {
+    Serial.println("CRITICAL: Both sensors are offline! Transmitting empty metrics.");
   }
 
   // Read Battery Voltage (A0 Pin)
@@ -124,7 +159,7 @@ void setup() {
 
   Serial.println("\n[BOOT] Diagnostics read successfully. Preparing radio transmitter...");
 
-  // 4. Initialize WiFi Captive Portal Manager
+  // 5. Initialize WiFi Captive Portal Manager
   WiFiManager wifiManager;
 
   // Design Customizations for Config Portal Webpage
@@ -147,23 +182,27 @@ void setup() {
   long rssi = WiFi.RSSI();
   Serial.print("RSSI Signal Strength: "); Serial.print(rssi); Serial.println(" dBm");
 
-  // 5. Construct JSON Payload
+  // 6. Construct JSON Payload
   StaticJsonDocument<384> doc;
   doc["api_key"]      = API_KEY;
   doc["device_id"]    = DEVICE_ID;
   
-  if (bmeConnected && !isnan(temperature) && !isnan(humidity) && !isnan(pressure)) {
+  if (!isnan(temperature) && !isnan(humidity)) {
     doc["temperature"] = round(temperature * 10) / 10.0; // 1 decimal place
     doc["humidity"]    = round(humidity * 10) / 10.0;
-    doc["pressure"]    = round(pressure * 10) / 10.0;
-    doc["bme_status"]  = true;
   } else {
     doc["temperature"] = nullptr;
     doc["humidity"]    = nullptr;
-    doc["pressure"]    = nullptr;
-    doc["bme_status"]  = false;
   }
   
+  if (!isnan(pressure)) {
+    doc["pressure"]    = round(pressure * 10) / 10.0;
+  } else {
+    doc["pressure"]    = nullptr;
+  }
+  
+  doc["bme_status"]    = bmeConnected;
+  doc["dht_status"]    = dhtConnected;
   doc["battery"]      = round(batteryVoltage * 100) / 100.0; // 2 decimal places
   doc["rssi"]         = rssi;
   doc["solar_status"] = solarStatus;
@@ -172,7 +211,7 @@ void setup() {
   serializeJson(doc, jsonPayload);
   Serial.print("JSON Payload: "); Serial.println(jsonPayload);
 
-  // 6. Send HTTP POST to Laravel Platform
+  // 7. Send HTTP POST to Laravel Platform
   WiFiClientSecure client;
   client.setInsecure(); // Secure SSL connections without certificate strict checking
   
@@ -210,17 +249,22 @@ void setup() {
     }
   }
 
-  // 7. Output dynamic console diagnostic dashboard
+  // 8. Output dynamic console diagnostic dashboard
   Serial.println("\n================================================");
   Serial.println("         SOLAR WEATHER STATION DIAGNOSTICS      ");
   Serial.println("================================================");
   Serial.print("Device ID       : "); Serial.println(DEVICE_ID);
   Serial.print("BME280 Sensor   : "); Serial.println(bmeConnected ? "CONNECTED (OK)" : "ERROR (OFFLINE / CHECK I2C WIRING)");
+  Serial.print("DHT11 Sensor    : "); Serial.println(dhtConnected ? "CONNECTED (OK)" : "ERROR (OFFLINE / CHECK WIRING)");
   Serial.println("------------------------------------------------");
-  if (bmeConnected) {
+  if (bmeConnected || dhtConnected) {
     Serial.print("Temperature     : "); Serial.print(temperature, 1); Serial.println(" °C");
     Serial.print("Humidity        : "); Serial.print(humidity, 1); Serial.println(" %");
-    Serial.print("Pressure        : "); Serial.print(pressure, 1); Serial.println(" hPa");
+    if (!isnan(pressure)) {
+      Serial.print("Pressure        : "); Serial.print(pressure, 1); Serial.println(" hPa");
+    } else {
+      Serial.println("Pressure        : [NOT SUPPORTED BY DHT11]");
+    }
   } else {
     Serial.println("Meteorology     : [SENSOR OFFLINE - NULL TRANSMITTED]");
   }
@@ -241,7 +285,7 @@ void setup() {
   Serial.print("Server Telemetry: "); Serial.println(uploadSuccess ? "SUCCESS (HTTP 200)" : "FAILED (CHECK INTERNET/HOSTINGER)");
   Serial.println("================================================\n");
 
-  // 8. Enter Deep Sleep
+  // 9. Enter Deep Sleep
   enterDeepSleep();
 }
 

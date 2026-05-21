@@ -38,10 +38,10 @@ class DashboardController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->first();
 
-            // Consider online if active and seen within the last 15 minutes
+            // Consider online if active and seen within the last 1 minute
             $isOnline = $device->status === 'active'
                 && $device->last_seen
-                && Carbon::parse($device->last_seen)->gt(now()->subMinutes(15));
+                && Carbon::parse($device->last_seen)->gt(now()->subMinutes(1));
 
             $device->latest_log = $latestLog;
             $device->is_online = $isOnline;

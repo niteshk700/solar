@@ -11,8 +11,8 @@
  *    [BME280 Pin]      --->  [NodeMCU Pin]   --->  [Description]
  *    VCC               --->  3V3             --->  Power Supply (3.3V)
  *    GND               --->  GND             --->  System Ground
- *    SCL               --->  D3 (GPIO 0)     --->  I2C Clock Line
- *    SDA               --->  D5 (GPIO 14)    --->  I2C Data Line
+ *    SCL               --->  D1 (GPIO 5)     --->  I2C Clock Line
+ *    SDA               --->  D2 (GPIO 4)     --->  I2C Data Line
  * 
  * 2. DHT11 Environmental Sensor (Single-bus - Secondary Backup Sensor)
  *    [DHT11 Pin]       --->  [NodeMCU Pin]   --->  [Description]
@@ -28,8 +28,8 @@
  *    BAT-              --->  18650 Battery(-)--->  Negative Battery terminal
  *    OUT+              --->  NodeMCU VIN     --->  System Power Supply (Filtered)
  *    OUT-              --->  NodeMCU GND     --->  System Common Ground
- *    CHRG (Pin 7 LED)  --->  NodeMCU D6      --->  Low when actively Charging (GPIO 12)
- *    STDBY (Pin 6 LED) --->  NodeMCU D4      --->  Low when battery is fully Charged (GPIO 2)
+ *    CHRG (Pin 7 LED)  --->  NodeMCU D5      --->  Low when actively Charging (GPIO 14)
+ *    STDBY (Pin 6 LED) --->  NodeMCU D6      --->  Low when battery is fully Charged (GPIO 12)
  * 
  * 4. 18650 Battery Monitoring Divider Circuit (A0 Pin)
  *    To read high battery voltages (3.0V - 4.2V) on the analog input safely:
@@ -75,9 +75,9 @@ const uint64_t SLEEP_DURATION_US = 10 * 1000000ULL;
 const char* PORTAL_AP_SSID = "Solar_Weather_Setup"; // Open SSID name
 const int PORTAL_TIMEOUT_SEC = 180; // 3-minute timeout to prevent battery drain
 
-// TP4056 Charger Digital Monitoring Pins (Moved to D6 and D4 to make room for I2C)
-const int PIN_TP4056_CHRG  = 12; // D6 on NodeMCU (GPIO 12)
-const int PIN_TP4056_STDBY = 2;  // D4 on NodeMCU (GPIO 2)
+// TP4056 Charger Digital Monitoring Pins
+const int PIN_TP4056_CHRG  = 14; // D5 on NodeMCU (GPIO 14)
+const int PIN_TP4056_STDBY = 12; // D6 on NodeMCU (GPIO 12)
 // ======================================================
 
 // Instantiate sensor drivers globally
@@ -99,8 +99,8 @@ void setup() {
   pinMode(PIN_TP4056_STDBY, INPUT_PULLUP);
 
   // 2. Initialize BME280 Environmental Sensor (I2C Primary)
-  Serial.println("Probing I2C bus for BME280 on pins D5 (SDA) and D3 (SCL)...");
-  Wire.begin(14, 0); // SDA = GPIO 14 (D5), SCL = GPIO 0 (D3)
+  Serial.println("Probing I2C bus for BME280 on pins D2 (SDA) and D1 (SCL)...");
+  Wire.begin(4, 5); // SDA = GPIO 4 (D2), SCL = GPIO 5 (D1)
   if (bme.begin(0x76) || bme.begin(0x77)) {
     bmeConnected = true;
     Serial.println("BME280 Environmental Sensor successfully initialized!");

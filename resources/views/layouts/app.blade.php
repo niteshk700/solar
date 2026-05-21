@@ -2,9 +2,26 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>@yield('title', 'Solar IoT Weather Platform')</title>
-    
+
+    <!-- ===== PWA Meta Tags ===== -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3B82F6" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Apple PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Solar Weather">
+    <link rel="apple-touch-icon" href="/icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
+    <!-- Microsoft PWA -->
+    <meta name="msapplication-TileImage" content="/icons/icon-144.png">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <!-- SEO -->
+    <meta name="description" content="Real-time solar IoT telemetry and environmental monitoring dashboard for ESP8266 weather stations.">
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -13,6 +30,81 @@
     
     <!-- Custom Glassmorphism Stylesheet -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+    <style>
+    /* PWA Install Banner */
+    #pwa-install-banner {
+        position: fixed;
+        bottom: -120px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 32px);
+        max-width: 480px;
+        background: rgba(15, 23, 42, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 20px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        z-index: 9999;
+        transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 -4px 40px rgba(59, 130, 246, 0.15), 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #pwa-install-banner.show { bottom: 24px; }
+    #pwa-install-banner .pwa-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        flex-shrink: 0;
+        object-fit: cover;
+    }
+    #pwa-install-banner .pwa-text { flex: 1; min-width: 0; }
+    #pwa-install-banner .pwa-title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #pwa-install-banner .pwa-subtitle {
+        font-size: 0.75rem;
+        color: rgba(148, 163, 184, 0.9);
+    }
+    #pwa-install-banner .pwa-install-btn {
+        background: linear-gradient(135deg, #3B82F6, #6366f1);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+    #pwa-install-banner .pwa-install-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    }
+    #pwa-install-banner .pwa-dismiss-btn {
+        background: transparent;
+        border: none;
+        color: rgba(148, 163, 184, 0.7);
+        padding: 6px;
+        cursor: pointer;
+        border-radius: 6px;
+        flex-shrink: 0;
+        font-size: 1rem;
+        transition: color 0.2s;
+    }
+    #pwa-install-banner .pwa-dismiss-btn:hover { color: #f1f5f9; }
+    </style>
     
     @yield('styles')
 </head>
@@ -104,6 +196,21 @@
         </main>
     </div>
 
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" role="dialog" aria-label="Install App">
+        <img src="/icons/icon-192.png" alt="Solar Weather Icon" class="pwa-icon">
+        <div class="pwa-text">
+            <div class="pwa-title">Install Solar Weather</div>
+            <div class="pwa-subtitle">Add to home screen for instant access</div>
+        </div>
+        <button class="pwa-install-btn" id="pwa-install-btn">
+            <i class="fa-solid fa-download me-1"></i> Install
+        </button>
+        <button class="pwa-dismiss-btn" id="pwa-dismiss-btn" aria-label="Dismiss">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -173,5 +280,66 @@
     </script>
     
     @yield('scripts')
+
+    <!-- ===== PWA Service Worker Registration & Install Prompt ===== -->
+    <script>
+    (function() {
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('[PWA] Service Worker registered. Scope:', reg.scope))
+                    .catch(err => console.warn('[PWA] Service Worker registration failed:', err));
+            });
+        }
+
+        // PWA Install Banner Logic
+        let deferredPrompt = null;
+        const banner = document.getElementById('pwa-install-banner');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+        // Listen for the browser's native install prompt
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Only show if not already dismissed this session
+            const dismissed = sessionStorage.getItem('pwa_banner_dismissed');
+            if (!dismissed && banner) {
+                setTimeout(() => banner.classList.add('show'), 1500);
+            }
+        });
+
+        // Handle Install button click
+        if (installBtn) {
+            installBtn.addEventListener('click', function() {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(choice => {
+                    if (choice.outcome === 'accepted') {
+                        console.log('[PWA] User accepted the install prompt!');
+                    }
+                    deferredPrompt = null;
+                    banner.classList.remove('show');
+                });
+            });
+        }
+
+        // Handle Dismiss button click
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', function() {
+                banner.classList.remove('show');
+                sessionStorage.setItem('pwa_banner_dismissed', '1');
+            });
+        }
+
+        // Hide banner once the app is installed
+        window.addEventListener('appinstalled', function() {
+            console.log('[PWA] App successfully installed to home screen!');
+            if (banner) banner.classList.remove('show');
+        });
+    })();
+    </script>
 </body>
 </html>

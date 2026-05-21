@@ -215,6 +215,10 @@ void setup() {
   int retryCount = 0;
   bool uploadSuccess = false;
   
+  // Track exact errors for visual dashboard print
+  int lastHttpCode = 0;
+  String lastHttpError = "None";
+  
   while (retryCount < 3 && !uploadSuccess) {
     if (retryCount == 0) {
       Serial.println("Attempting secure HTTPS upload...");
@@ -226,7 +230,9 @@ void setup() {
         http.addHeader("Content-Type", "application/json");
         int httpCode = http.POST(jsonPayload);
         
+        lastHttpCode = httpCode;
         if (httpCode > 0) {
+          lastHttpError = "HTTP Status " + String(httpCode);
           Serial.print("HTTPS Response Code: "); Serial.println(httpCode);
           String response = http.getString();
           Serial.print("Response: "); Serial.println(response);
@@ -235,11 +241,14 @@ void setup() {
             Serial.println("Telemetry successfully received by Laravel!");
           }
         } else {
-          Serial.print("HTTPS Connection Error: "); Serial.println(http.errorToString(httpCode).c_str());
+          lastHttpError = http.errorToString(httpCode);
+          Serial.print("HTTPS Connection Error: "); Serial.println(lastHttpError);
         }
         http.end();
       } else {
-        Serial.println("HTTPS initialization failed (out of heap memory).");
+        lastHttpCode = -99;
+        lastHttpError = "Out of heap memory (SSL)";
+        Serial.println(lastHttpError);
       }
     } else {
       Serial.println("Falling back to plain HTTP to bypass TLS memory constraints...");
@@ -250,7 +259,9 @@ void setup() {
         http.addHeader("Content-Type", "application/json");
         int httpCode = http.POST(jsonPayload);
         
+        lastHttpCode = httpCode;
         if (httpCode > 0) {
+          lastHttpError = "HTTP Status " + String(httpCode);
           Serial.print("HTTP Response Code: "); Serial.println(httpCode);
           String response = http.getString();
           Serial.print("Response: "); Serial.println(response);
@@ -259,11 +270,14 @@ void setup() {
             Serial.println("Telemetry successfully received by Laravel!");
           }
         } else {
-          Serial.print("HTTP Connection Error: "); Serial.println(http.errorToString(httpCode).c_str());
+          lastHttpError = http.errorToString(httpCode);
+          Serial.print("HTTP Connection Error: "); Serial.println(lastHttpError);
         }
         http.end();
       } else {
-        Serial.println("HTTP initialization failed.");
+        lastHttpCode = -98;
+        lastHttpError = "HTTP Init Failed";
+        Serial.println(lastHttpError);
       }
     }
     
@@ -307,7 +321,13 @@ void setup() {
   Serial.println("------------------------------------------------");
   Serial.print("WiFi Network    : "); Serial.println(WiFi.SSID());
   Serial.print("Signal Strength : "); Serial.print(WiFi.RSSI()); Serial.println(" dBm");
-  Serial.print("Server Telemetry: "); Serial.println(uploadSuccess ? "SUCCESS (HTTP 200)" : "FAILED (CHECK INTERNET/HOSTINGER)");
+  Serial.print("Server Telemetry: "); 
+  if (uploadSuccess) {
+    Serial.println("SUCCESS (HTTP 200)");
+  } else {
+    Serial.print("FAILED (Code: "); Serial.print(lastHttpCode);
+    Serial.print(" | Error: "); Serial.print(lastHttpError); Serial.println(")");
+  }
   Serial.println("================================================\n");
 
   // 9. Enter Deep Sleep

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Nitra Campus Solar Weather Portal</title>
+    <title>Login - Nitra Technical Campus Solar Weather Portal</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome 6 Icons -->
@@ -35,7 +35,7 @@
                     <img src="https://nitra.ac.in/wp-content/uploads/2024/08/cropped-cropped-Untitled-design-7.png" alt="Nitra Logo"
                          style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
                 </div>
-                <h1 class="h3 font-heading fw-extrabold mb-1 text-primary">Nitra Campus</h1>
+                <h1 class="h3 font-heading fw-extrabold mb-1 text-primary">Nitra Technical Campus</h1>
                 <p class="text-warning fw-semibold small">Solar IoT Weather Portal</p>
             </div>
 

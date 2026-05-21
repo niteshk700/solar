@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Control Center - Nitra Campus Solar IoT Portal')
+@section('title', 'Control Center - Nitra Technical Campus Solar IoT Portal')
 
 @section('content')
 <style>
@@ -149,7 +149,7 @@
                 NITRA TECHNICAL CAMPUS
             </span>
         </h2>
-        <p class="content-subtitle">Real-time solar telemetry and environmental insights from Nitra Campus</p>
+        <p class="content-subtitle">Real-time solar telemetry and environmental insights from Nitra Technical Campus</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <button id="btn-force-sync" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">

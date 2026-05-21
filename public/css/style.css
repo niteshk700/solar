@@ -64,9 +64,9 @@
     --card-border: rgba(255, 255, 255, 0.05);
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #475569;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
     
     --primary: hsl(217, 80%, 58%);
     --primary-glow: rgba(59, 130, 246, 0.1);

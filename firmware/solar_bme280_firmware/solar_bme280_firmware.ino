@@ -211,35 +211,60 @@ void setup() {
   serializeJson(doc, jsonPayload);
   Serial.print("JSON Payload: "); Serial.println(jsonPayload);
 
-  // 7. Send HTTP POST to Laravel Platform
-  WiFiClientSecure client;
-  client.setInsecure(); // Secure SSL connections without certificate strict checking
-  
-  HTTPClient http;
-  Serial.print("Transmitting telemetry to: "); Serial.println(SERVER_URL);
-  
+  // 7. Send HTTP POST to Laravel Platform (with Self-Healing HTTP Fallback)
   int retryCount = 0;
   bool uploadSuccess = false;
   
   while (retryCount < 3 && !uploadSuccess) {
-    if (http.begin(client, SERVER_URL)) {
-      http.addHeader("Content-Type", "application/json");
+    if (retryCount == 0) {
+      Serial.println("Attempting secure HTTPS upload...");
+      WiFiClientSecure secureClient;
+      secureClient.setInsecure(); // Bypass TLS certificate checking
       
-      int httpCode = http.POST(jsonPayload);
-      
-      if (httpCode > 0) {
-        Serial.print("HTTP Response Code: "); Serial.println(httpCode);
-        String response = http.getString();
-        Serial.print("Response: "); Serial.println(response);
+      HTTPClient http;
+      if (http.begin(secureClient, "https://solar.yourdev.in/api/weather-data")) {
+        http.addHeader("Content-Type", "application/json");
+        int httpCode = http.POST(jsonPayload);
         
-        if (httpCode == 200) {
-          uploadSuccess = true;
-          Serial.println("Telemetry successfully received by Laravel!");
+        if (httpCode > 0) {
+          Serial.print("HTTPS Response Code: "); Serial.println(httpCode);
+          String response = http.getString();
+          Serial.print("Response: "); Serial.println(response);
+          if (httpCode == 200) {
+            uploadSuccess = true;
+            Serial.println("Telemetry successfully received by Laravel!");
+          }
+        } else {
+          Serial.print("HTTPS Connection Error: "); Serial.println(http.errorToString(httpCode).c_str());
         }
+        http.end();
       } else {
-        Serial.print("HTTP Error: "); Serial.println(http.errorToString(httpCode).c_str());
+        Serial.println("HTTPS initialization failed (out of heap memory).");
       }
-      http.end();
+    } else {
+      Serial.println("Falling back to plain HTTP to bypass TLS memory constraints...");
+      WiFiClient plainClient;
+      
+      HTTPClient http;
+      if (http.begin(plainClient, "http://solar.yourdev.in/api/weather-data")) {
+        http.addHeader("Content-Type", "application/json");
+        int httpCode = http.POST(jsonPayload);
+        
+        if (httpCode > 0) {
+          Serial.print("HTTP Response Code: "); Serial.println(httpCode);
+          String response = http.getString();
+          Serial.print("Response: "); Serial.println(response);
+          if (httpCode == 200) {
+            uploadSuccess = true;
+            Serial.println("Telemetry successfully received by Laravel!");
+          }
+        } else {
+          Serial.print("HTTP Connection Error: "); Serial.println(http.errorToString(httpCode).c_str());
+        }
+        http.end();
+      } else {
+        Serial.println("HTTP initialization failed.");
+      }
     }
     
     if (!uploadSuccess) {

@@ -92,7 +92,7 @@ bool dhtConnected = false;
 void setup() {
   Serial.begin(115200);
   delay(10);
-  Serial.println("\n--- Solar Weather Station Waking Up ---");
+  Serial.println("\n--- Solar Weather Station Powering On ---");
 
   // 1. Initialize TP4056 Charger Pins as digital inputs with pullup resistors
   pinMode(PIN_TP4056_CHRG, INPUT_PULLUP);
@@ -121,25 +121,61 @@ void setup() {
     Serial.println("WARNING: DHT11 Sensor not found, check wiring!");
   }
 
-  // 4. Read Meteorological Metrics (Executing dynamic BME280 ➔ DHT11 Failover Logic)
+  // 4. Initialize WiFi Captive Portal Manager
+  WiFiManager wifiManager;
+
+  // Design Customizations for Config Portal Webpage
+  wifiManager.setAPStaticIPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+  wifiManager.setConfigPortalTimeout(PORTAL_TIMEOUT_SEC);
+
+  Serial.println("Attempting to connect to stored WiFi credentials...");
+  
+  // If stored WiFi connection fails, WiFiManager spins up the Captive Portal Hotspot
+  if (!wifiManager.autoConnect(PORTAL_AP_SSID)) {
+    Serial.println("Connection failed or configuration portal timed out. Resetting to try again...");
+    ESP.restart();
+  }
+
+  // Once connected to the local WiFi, the access point hotspot is automatically turned off.
+  Serial.println("\nWiFi Connected successfully! Starting real-time 2-second telemetry loop...");
+}
+
+void loop() {
+  // Ensure we are connected to WiFi
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi connection lost! Attempting background reconnection...");
+    WiFi.reconnect();
+    int reconnectAttempts = 0;
+    while (WiFi.status() != WL_CONNECTED && reconnectAttempts < 6) {
+      delay(500);
+      reconnectAttempts++;
+    }
+  }
+
+  // 1. Dynamic Real-Time Sensor Presence Checking
+  // Test BME280 live
+  float bmeT = bme.readTemperature();
+  bmeConnected = !isnan(bmeT) && (bmeT > -40.0 && bmeT < 85.0);
+  
+  // Test DHT11 live
+  float dhtT = dht.readTemperature();
+  dhtConnected = !isnan(dhtT);
+
+  // 2. Read Meteorological Metrics (Executing dynamic BME280 ➔ DHT11 Failover Logic)
   float temperature = NAN;
   float humidity    = NAN;
   float pressure    = NAN;
 
   if (bmeConnected) {
     // Primary reading from high-accuracy BME280 sensor
-    temperature = bme.readTemperature();
+    temperature = bmeT;
     humidity    = bme.readHumidity();
     pressure    = bme.readPressure() / 100.0F; // Convert Pa to hPa
-    Serial.println("Environmental Data sourced from: BME280 (Primary)");
   } else if (dhtConnected) {
     // Failover reading from secondary DHT11 sensor
-    temperature = dht.readTemperature();
+    temperature = dhtT;
     humidity    = dht.readHumidity();
     pressure    = NAN; // DHT11 does not measure pressure
-    Serial.println("Environmental Data sourced from: DHT11 (Backup Failover)");
-  } else {
-    Serial.println("CRITICAL: Both sensors are offline! Transmitting empty metrics.");
   }
 
   // Read Battery Voltage (A0 Pin)
@@ -157,32 +193,9 @@ void setup() {
     solarStatus = "full";
   }
 
-  Serial.println("\n[BOOT] Diagnostics read successfully. Preparing radio transmitter...");
-
-  // 5. Initialize WiFi Captive Portal Manager
-  WiFiManager wifiManager;
-
-  // Design Customizations for Config Portal Webpage
-  wifiManager.setAPStaticIPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
-  
-  // Power-optimization: portal timeout. If no user connects/saves credentials within 3 mins,
-  // sleep the station to avoid infinite power consumption.
-  wifiManager.setConfigPortalTimeout(PORTAL_TIMEOUT_SEC);
-
-  Serial.println("Attempting to connect to stored WiFi credentials...");
-  
-  // If stored WiFi connection fails, WiFiManager spins up the Captive Portal Hotspot
-  if (!wifiManager.autoConnect(PORTAL_AP_SSID)) {
-    Serial.println("Connection failed or configuration portal timed out. Entering deep sleep...");
-    enterDeepSleep();
-  }
-
-  // Once connected to the local WiFi, the access point hotspot is automatically turned off.
-  Serial.println("\nWiFi Connected successfully!");
   long rssi = WiFi.RSSI();
-  Serial.print("RSSI Signal Strength: "); Serial.print(rssi); Serial.println(" dBm");
 
-  // 6. Construct JSON Payload
+  // 3. Construct JSON Payload
   StaticJsonDocument<384> doc;
   doc["api_key"]      = API_KEY;
   doc["device_id"]    = DEVICE_ID;
@@ -209,9 +222,9 @@ void setup() {
 
   String jsonPayload;
   serializeJson(doc, jsonPayload);
-  Serial.print("JSON Payload: "); Serial.println(jsonPayload);
+  Serial.print("\nJSON Payload: "); Serial.println(jsonPayload);
 
-  // 7. Send HTTP POST to Laravel Platform (with Self-Healing HTTP Fallback)
+  // 4. Send HTTP POST to Laravel Platform (with Self-Healing HTTP Fallback)
   int retryCount = 0;
   bool uploadSuccess = false;
   
@@ -283,12 +296,12 @@ void setup() {
     
     if (!uploadSuccess) {
       retryCount++;
-      Serial.print("Upload failed, retrying in 2 seconds... (Try "); Serial.print(retryCount); Serial.println("/3)");
-      delay(2000);
+      Serial.print("Upload failed, retrying... (Try "); Serial.print(retryCount); Serial.println("/3)");
+      delay(500); // Short retry delay
     }
   }
 
-  // 8. Output dynamic console diagnostic dashboard
+  // 5. Output dynamic console diagnostic dashboard
   Serial.println("\n================================================");
   Serial.println("         SOLAR WEATHER STATION DIAGNOSTICS      ");
   Serial.println("================================================");
@@ -330,22 +343,6 @@ void setup() {
   }
   Serial.println("================================================\n");
 
-  // 9. Enter Deep Sleep
-  enterDeepSleep();
-}
-
-void loop() {
-  // Loop is never reached as device goes to sleep in setup()
-}
-
-void enterDeepSleep() {
-  Serial.println("Powering down WiFi radio...");
-  WiFi.disconnect(true);
-  delay(1);
-  
-  Serial.print("Entering ultra-low power Deep Sleep for ");
-  Serial.print(SLEEP_DURATION_US / 1000000ULL / 60);
-  Serial.println(" minutes...");
-  
-  ESP.deepSleep(SLEEP_DURATION_US);
+  // Wait exactly 2 seconds before looping again
+  delay(2000);
 }

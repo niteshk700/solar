@@ -119,16 +119,7 @@ void setup() {
     solarStatus = "full";
   }
 
-  Serial.println("\n--- Diagnostic Telemetry Snapshot ---");
-  if (bmeConnected) {
-    Serial.print("Temp:      "); Serial.print(temperature); Serial.println(" C");
-    Serial.print("Hum:       "); Serial.print(humidity); Serial.println(" %");
-    Serial.print("Pres:      "); Serial.print(pressure); Serial.println(" hPa");
-  } else {
-    Serial.println("Temp/Hum/Pres: [SENSOR OFFLINE]");
-  }
-  Serial.print("Battery V: "); Serial.print(batteryVoltage); Serial.println(" V");
-  Serial.print("Solar Chg: "); Serial.println(solarStatus);
+  Serial.println("\n[BOOT] Diagnostics read successfully. Preparing radio transmitter...");
 
   // 4. Initialize WiFi Captive Portal Manager
   WiFiManager wifiManager;
@@ -216,7 +207,38 @@ void setup() {
     }
   }
 
-  // 7. Enter Deep Sleep
+  // 7. Output dynamic console diagnostic dashboard
+  Serial.println("\n================================================");
+  Serial.println("         SOLAR WEATHER STATION DIAGNOSTICS      ");
+  Serial.println("================================================");
+  Serial.print("Device ID       : "); Serial.println(DEVICE_ID);
+  Serial.print("BME280 Sensor   : "); Serial.println(bmeConnected ? "CONNECTED (OK)" : "ERROR (OFFLINE / CHECK I2C WIRING)");
+  Serial.println("------------------------------------------------");
+  if (bmeConnected) {
+    Serial.print("Temperature     : "); Serial.print(temperature, 1); Serial.println(" °C");
+    Serial.print("Humidity        : "); Serial.print(humidity, 1); Serial.println(" %");
+    Serial.print("Pressure        : "); Serial.print(pressure, 1); Serial.println(" hPa");
+  } else {
+    Serial.println("Meteorology     : [SENSOR OFFLINE - NULL TRANSMITTED]");
+  }
+  Serial.println("------------------------------------------------");
+  int batPct = 0;
+  if (batteryVoltage >= 4.2) batPct = 100;
+  else if (batteryVoltage <= 3.5) batPct = 0;
+  else batPct = round(((batteryVoltage - 3.5) / 0.7) * 100);
+  
+  Serial.print("Battery Voltage : "); Serial.print(batteryVoltage, 2); Serial.print(" V ("); Serial.print(batPct); Serial.println("%)");
+  Serial.print("Solar Charger   : "); 
+  if (solarStatus == "charging") Serial.println("CHARGING (Sunlight Active)");
+  else if (solarStatus == "full") Serial.println("FULLY CHARGED (Battery Topped Off)");
+  else Serial.println("IDLE (Low Light / Solar Offline)");
+  Serial.println("------------------------------------------------");
+  Serial.print("WiFi Network    : "); Serial.println(WiFi.SSID());
+  Serial.print("Signal Strength : "); Serial.print(WiFi.RSSI()); Serial.println(" dBm");
+  Serial.print("Server Telemetry: "); Serial.println(uploadSuccess ? "SUCCESS (HTTP 200)" : "FAILED (CHECK INTERNET/HOSTINGER)");
+  Serial.println("================================================\n");
+
+  // 8. Enter Deep Sleep
   enterDeepSleep();
 }
 

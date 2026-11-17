@@ -35,7 +35,7 @@
 
 <!-- Dynamic API token single-reveal banner -->
 @if(session('plain_token'))
-    <div class="glass-panel p-4 mb-4 border-primary" style="background: rgba(99, 102, 241, 0.08);">
+    <div class="glass-panel p-4 mb-4" style="background: var(--sidebar-active); border: 1px solid var(--card-border);">
         <div class="d-flex align-items-center gap-2 text-primary mb-3">
             <i class="fa-solid fa-key" style="font-size: 1.2rem;"></i>
             <h4 class="h6 font-heading fw-bold mb-0">New Admin API Token Generated</h4>

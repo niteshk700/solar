@@ -48,30 +48,30 @@
     <div class="row g-4 mb-4">
         <!-- Temp -->
         <div class="col-6 col-md-3">
-            <div class="glass-card p-3 text-center border-danger-subtle">
+            <div class="glass-card p-3 text-center" style="border-top: 3px solid #f43f5e !important;">
                 <div class="text-secondary small">Latest Temp</div>
-                <div class="h4 font-heading fw-bold text-danger mt-1 m-0">{{ $latestLog->temperature }}°C</div>
+                <div class="h4 font-heading fw-bold mt-1 m-0" style="color: #f43f5e;">{{ $latestLog->temperature }}°C</div>
             </div>
         </div>
         <!-- Humidity -->
         <div class="col-6 col-md-3">
-            <div class="glass-card p-3 text-center border-primary-subtle">
+            <div class="glass-card p-3 text-center" style="border-top: 3px solid #0ea5e9 !important;">
                 <div class="text-secondary small">Latest Humidity</div>
-                <div class="h4 font-heading fw-bold text-primary mt-1 m-0">{{ $latestLog->humidity }}%</div>
+                <div class="h4 font-heading fw-bold mt-1 m-0" style="color: #0ea5e9;">{{ $latestLog->humidity }}%</div>
             </div>
         </div>
         <!-- Battery -->
         <div class="col-6 col-md-3">
-            <div class="glass-card p-3 text-center border-success-subtle">
+            <div class="glass-card p-3 text-center" style="border-top: 3px solid #10b981 !important;">
                 <div class="text-secondary small">Latest Battery</div>
-                <div class="h4 font-heading fw-bold text-success mt-1 m-0">{{ $latestLog->battery }}V</div>
+                <div class="h4 font-heading fw-bold mt-1 m-0" style="color: #10b981;">{{ $latestLog->battery }}V</div>
             </div>
         </div>
         <!-- RSSI -->
         <div class="col-6 col-md-3">
-            <div class="glass-card p-3 text-center border-warning-subtle">
+            <div class="glass-card p-3 text-center" style="border-top: 3px solid #f59e0b !important;">
                 <div class="text-secondary small">Latest RSSI</div>
-                <div class="h4 font-heading fw-bold text-warning mt-1 m-0">{{ $latestLog->rssi }} dBm</div>
+                <div class="h4 font-heading fw-bold mt-1 m-0" style="color: #f59e0b;">{{ $latestLog->rssi }} dBm</div>
             </div>
         </div>
     </div>
@@ -168,10 +168,13 @@
                 }
             };
 
-            // 1. Temperature Chart
+            const monoPrimary = isDark ? '#fafafa' : '#09090b';
+            const monoSecondary = '#71717a';
+
+            // 1. Temperature Chart (Vibrant Coral Rose)
             const tempOptions = {
                 ...baseOptions,
-                colors: ['#e11d48'],
+                colors: ['#f43f5e'],
                 series: [{
                     name: 'Temperature',
                     data: {!! json_encode($chartData['temperature']) !!}
@@ -184,8 +187,8 @@
                     type: 'gradient',
                     gradient: {
                         shadeIntensity: 1,
-                        opacityFrom: 0.12,
-                        opacityTo: 0.01,
+                        opacityFrom: 0.25,
+                        opacityTo: 0.02,
                         stops: [0, 95]
                     }
                 },
@@ -196,10 +199,10 @@
             };
             new ApexCharts(document.querySelector("#temperatureChart"), tempOptions).render();
 
-            // 2. Humidity Chart
+            // 2. Humidity Chart (Vibrant Sky Cyan)
             const humOptions = {
                 ...baseOptions,
-                colors: ['#2563eb'],
+                colors: ['#0ea5e9'],
                 series: [{
                     name: 'Humidity',
                     data: {!! json_encode($chartData['humidity']) !!}
@@ -212,8 +215,8 @@
                     type: 'gradient',
                     gradient: {
                         shadeIntensity: 1,
-                        opacityFrom: 0.12,
-                        opacityTo: 0.01,
+                        opacityFrom: 0.22,
+                        opacityTo: 0.02,
                         stops: [0, 95]
                     }
                 },
@@ -224,11 +227,11 @@
             };
             new ApexCharts(document.querySelector("#humidityChart"), humOptions).render();
 
-            // 3. Pressure Chart
+            // 3. Pressure Chart (Vibrant Violet)
             const pressOptions = {
                 ...baseOptions,
                 chart: { ...baseOptions.chart, type: 'line' },
-                colors: ['#0891b2'],
+                colors: ['#8b5cf6'],
                 series: [{
                     name: 'Pressure',
                     data: {!! json_encode($chartData['pressure']) !!}
@@ -241,11 +244,11 @@
             };
             new ApexCharts(document.querySelector("#pressureChart"), pressOptions).render();
 
-            // 4. Battery Chart
+            // 4. Battery Chart (Vibrant Emerald)
             const batOptions = {
                 ...baseOptions,
                 chart: { ...baseOptions.chart, type: 'line' },
-                colors: ['#059669'],
+                colors: ['#10b981'],
                 series: [{
                     name: 'Battery Voltage',
                     data: {!! json_encode($chartData['battery']) !!}
@@ -260,11 +263,11 @@
             };
             new ApexCharts(document.querySelector("#batteryChart"), batOptions).render();
 
-            // 5. RSSI Chart
+            // 5. RSSI Chart (Vibrant Amber)
             const rssiOptions = {
                 ...baseOptions,
                 chart: { ...baseOptions.chart, height: 200, type: 'bar' },
-                colors: ['#d97706'],
+                colors: ['#f59e0b'],
                 series: [{
                     name: 'WiFi RSSI',
                     data: {!! json_encode($chartData['rssi']) !!}

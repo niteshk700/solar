@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/niteshk700/solar">
-    <img src="public/icons/logo.png" alt="Solar IoT Logo" width="128" height="128" style="border-radius: 24px; filter: drop-shadow(0 12px 28px rgba(245, 158, 11, 0.25));" />
+    <img src="public/icons/icon-512.png" alt="Solar IoT Logo" width="128" height="128" style="border-radius: 28px; filter: drop-shadow(0 12px 28px rgba(245, 158, 11, 0.28));" />
   </a>
 </p>
 
@@ -412,5 +412,5 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for complete det
 ---
 
 <p align="center">
-  Crafted for <strong>Nitra Technical Campus Solar IoT Portal</strong> &bull; Developed by <a href="https://github.com/niteshk700">Nitesh Kumar</a>
+  Crafted with ☀️ for the <strong>Solar IoT Platform</strong> &bull; Developed by <a href="https://github.com/niteshk700">Nitesh Kumar</a>
 </p>

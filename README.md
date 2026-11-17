@@ -1,211 +1,245 @@
-# ☀️ Solar IoT Weather Platform & Telemetry Station
+<p align="center">
+  <a href="https://github.com/niteshk700/solar">
+    <img src="public/icons/logo.png" alt="Solar IoT Logo" width="128" height="128" style="border-radius: 24px; filter: drop-shadow(0 12px 28px rgba(245, 158, 11, 0.25));" />
+  </a>
+</p>
+
+<h1 align="center">☀️ Solar IoT Telemetry & Control Center</h1>
 
 <p align="center">
-  <img src="public/icons/icon-192.png" alt="Solar IoT Logo" width="96" height="96" style="border-radius: 20%; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);" />
+  <strong>An enterprise-grade, solar-powered environmental monitoring platform featuring dual-sensor hardware failover, real-time reactive telemetry streaming, high-precision solar yield modeling, and PWA capabilities.</strong>
 </p>
 
 <p align="center">
-  <strong>An enterprise-grade, solar-powered environmental telemetry platform with dual-sensor hardware failover, real-time analytics, and high-precision solar yield modeling.</strong>
-</p>
-
-<p align="center">
-  <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel"></a>
+  <a href="https://github.com/niteshk700/solar/actions"><img src="https://img.shields.io/badge/Build-Passing-10b981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Build Status"></a>
+  <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel"></a>
   <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-8.3+-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.3"></a>
+  <a href="https://www.mysql.com"><img src="https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"></a>
   <a href="https://espressif.com"><img src="https://img.shields.io/badge/ESP8266-NodeMCU-E7352C?style=for-the-badge&logo=espressif&logoColor=white" alt="ESP8266"></a>
-  <a href="https://getbootstrap.com"><img src="https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap 5"></a>
   <a href="https://chartjs.org"><img src="https://img.shields.io/badge/Chart.js-Analytics-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Chart.js"></a>
-  <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps"><img src="https://img.shields.io/badge/PWA-Ready-3B82F6?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License"></a>
+</p>
+
+<p align="center">
+  <a href="#-architecture--data-flow">Architecture</a> •
+  <a href="#-key-features">Key Features</a> •
+  <a href="#-hardware-schematic--pinout">Hardware Wiring</a> •
+  <a href="#-quick-start-guide">Quick Start</a> •
+  <a href="#-rest-api-documentation">REST API</a> •
+  <a href="#-firmware-guide">Firmware</a> •
+  <a href="#-test-suite">Testing</a>
 </p>
 
 ---
 
-## 📖 Overview
+## 🌟 Highlights
 
-The **Solar IoT Weather Platform** is a full-stack IoT telemetry ecosystem designed for remote environmental monitoring and solar energy analytics. It bridges embedded sensor hardware (ESP8266 + Bosch BME280 + DHT11) with a reactive Laravel web application, offering live dashboards, historical time-series analytics, failover redundancy diagnostics, and mathematical solar generation modeling.
+- ⚡ **Autonomous Off-Grid Operation:** Custom 3W solar PV + TP4056 lithium charging module powering an ESP8266 node with low-power deep sleep cycles.
+- 🛡️ **Dual-Sensor Hardware Failover:** Automatic fallback from Bosch BME280 (I2C) to DHT11 digital one-wire bus if sensor I/O disconnection or packet checksum errors occur.
+- 📈 **Real-Time Reactive Streaming:** Micro-polling live engine with visual flash cues and dual-axis Chart.js telemetry without browser refresh.
+- ☀️ **100kW Diurnal Solar Power Engine:** Mathematical model computing Active Power ($kW$), Daily Yield ($kWh$), Specific Yield ($kWh/kWp$), Avoided $CO_2$ (Tonnes), and Capacity Utilization Factor ($CUF$).
+- 📱 **Progressive Web App (PWA):** Zero-install, mobile-optimized experience with service workers and asset caching on iOS, Android, and Desktop.
+- 🔒 **Enterprise Security:** Token-authenticated REST ingestion with cryptographic token hashing and role-based session isolation.
+
+---
+
+## 🏗️ Architecture & Data Flow
 
 ```mermaid
-flowchart LR
-    subgraph Hardware [IoT Edge Node]
-        SP[3W Solar Panel] --> TP[TP4056 Charger]
-        TP --> Bat[18650 Li-ion]
-        Bat --> Div[Resistor Divider]
-        Div --> ESP[ESP8266 NodeMCU]
-        BME[BME280 Primary] -->|I2C| ESP
-        DHT[DHT11 Backup] -->|GPIO 13| ESP
+flowchart TD
+    subgraph Edge ["🌐 Off-Grid IoT Edge Station"]
+        PV["3W Solar Panel"] -->|"Solar Current"| TP["TP4056 Charger"]
+        TP -->|"Charge State (CHRG/STDBY)"| ESP["ESP8266 NodeMCU"]
+        TP -->|"Power Rail"| BAT["18650 Li-ion Cell (3.7V)"]
+        BAT -->|"Voltage Divider (220kΩ/100kΩ)"| ADC["ESP8266 ADC0 (A0)"]
+        
+        BME["Bosch BME280 (I2C)"] -->|"Primary: Temp, Hum, Press"| ESP
+        DHT["DHT11 (GPIO 13)"] -.->|"Secondary Failover: Temp, Hum"| ESP
     end
 
-    subgraph Transport [Network Layer]
-        ESP -->|WiFi / Captive Portal| AP[Local Access Point]
-        AP -->|HTTPS / HTTP Failover| API[REST Ingestion API]
+    subgraph Ingestion ["🚀 Ingestion & Network Transport"]
+        ESP -->|"Captive Portal / WiFi"| ROUTER["Local AP / Cellular Gateway"]
+        ROUTER -->|"HTTPS (with HTTP Failover)"| API["POST /api/weather-data"]
     end
 
-    subgraph Cloud [Laravel Core]
-        API --> DB[(MySQL / SQLite)]
-        DB --> Engine[Solar Simulation Engine]
-        Engine --> Dash[Glassmorphic Dashboard]
-        Engine --> Analytics[Chart.js Telemetry]
-        Engine --> Export[Streaming CSV Export]
+    subgraph Core ["⚡ Laravel 12 Telemetry Core"]
+        API --> AUTH["API Key Verification & Throttling"]
+        AUTH --> DB[("MySQL / SQLite Telemetry Store")]
+        DB --> SIM["Solar Diurnal Modeling Engine"]
+        SIM --> DASH["Reactive Live Control Center"]
+        SIM --> CHARTS["Interactive Chart.js / ApexCharts Analytics"]
+        DB --> EXPORT["Chunked UTF-8 BOM CSV Stream"]
     end
+```
+
+### Telemetry & Redundancy Protocol
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Sensor as BME280 / DHT11
+    participant Node as ESP8266 NodeMCU
+    participant API as Laravel Ingestion API
+    participant DB as Telemetry Database
+
+    Node->>Sensor: Probe BME280 via I2C (0x76)
+    alt BME280 Responsive
+        Sensor-->>Node: Return Temp, Humidity, Pressure (bme_status: true)
+    else BME280 Disconnected or Bus Error
+        Node->>Sensor: Read DHT11 One-Wire (GPIO 13)
+        Sensor-->>Node: Return Fallback Temp & Humidity (bme_status: false, dht_status: true)
+    end
+    Node->>Node: Sample Battery via A0 & Read TP4056 Pins (D5/D6)
+    Node->>API: POST /api/weather-data (JSON payload + API Key)
+    API->>API: Validate Token & Check Device Provisioning
+    API->>DB: Persist WeatherLog record & Update Device last_seen
+    API-->>Node: 200 OK {"status": "success"}
+    Node->>Node: Enter Deep Sleep (D0 connected to RST)
 ```
 
 ---
 
 ## ✨ Key Features
 
-### 🔌 Embedded Hardware & Firmware
-- **Dual-Sensor Redundancy with Automatic Failover:**
-  - **Primary:** Bosch BME280 sensor via I2C (temperature, humidity, atmospheric pressure).
-  - **Secondary:** DHT11 digital bus backup. If the BME280 disconnects or fails, telemetry seamlessly falls back to DHT11 without telemetry interruption.
-- **Solar & Battery Management:**
-  - **TP4056 Real-Time Monitoring:** Digital reading of charging (`CHRG`) and standby/full (`STDBY`) states.
-  - **18650 Battery Voltage Divider:** Dual-resistor divider ($220\,\text{k}\Omega / 100\,\text{k}\Omega$) reading cell voltage ($3.0\,\text{V} - 4.2\,\text{V}$) via analog pin `A0`.
-- **Zero-Friction WiFi Setup:**
-  - **WiFiManager Captive Portal:** Creates `Solar_Weather_Setup` hotspot when unconfigured, with a 3-minute battery-saving timeout.
-- **Robust Network Telemetry:**
-  - **Self-Healing Ingestion:** Tries secure HTTPS with TLS bypass, immediately falling back to standard HTTP if heap memory or network conditions constrain SSL handshakes.
-
-### 📊 Backend & Web Platform
-- **Real-Time Live Dashboard:**
-  - Glassmorphic UI styled with Bootstrap 5 and FontAwesome 6.
-  - Auto-updating telemetry stream via lightweight AJAX polling without page reloads.
-  - Dynamic fleet health summaries (online, offline, and inactive nodes).
-- **Solar Generation Simulation Service:**
-  - Analytical solar power curve modeling ($P_{\text{max}} = E_{\text{day}} \cdot \frac{\pi}{24}$, sinusoidal diurnal tracking).
-  - Deterministic minute-level sensor jitter ($\pm 4\%$) for realistic real-time simulation.
-  - Metrics tracking: Active Power ($\text{kW}$), Cumulative Energy ($\text{kWh}$), Specific Yield ($\text{SY}$), $\text{CO}_2$ Reduction (Tonnes), and Capacity Utilization Factor ($\text{CUF}$).
-- **Interactive Device Analytics:**
-  - Multi-series historical Chart.js graphs (Temperature, Humidity, Pressure, Battery Voltage, WiFi RSSI).
-  - Selectable time ranges ($24\text{h}$, $7\text{d}$, $30\text{d}$) with server-side adaptive downsampling.
-- **Device Management & Security:**
-  - Device provisioning with unique `device_id` and auto-generated API tokens.
-  - Authenticated REST API endpoint protection and device status toggles.
-- **High-Performance Data Export:**
-  - Chunked streaming CSV exports for environmental logs and solar telemetry.
-  - Embedded UTF-8 BOM encoding for seamless Microsoft Excel compatibility.
-- **Progressive Web App (PWA):**
-  - Installable on iOS, Android, and Desktop via manifest and service worker caching.
+| Category | Capability | Description |
+| :--- | :--- | :--- |
+| **Edge Hardware** | Dual-Sensor Redundancy | Bosch BME280 primary with automatic fallback to DHT11 digital one-wire bus. |
+| **Power Management** | Battery & Solar State | 18650 Li-ion voltage reading via scaled resistor divider + TP4056 digital pin sensing (`CHRG`, `STDBY`). |
+| **Zero-Config Setup** | WiFiManager Hotspot | Creates `Solar_Weather_Setup` captive portal upon unconfigured WiFi boot with a 3-minute power timeout. |
+| **Control Center** | Reactive Micro-Polling | 3-second live AJAX delta polling, value flash animations, and high-visibility status badges. |
+| **Solar Modeling** | Diurnal Simulation | $P(t) = P_{\text{max}} \cdot \sin(\theta)$ solar curve calculation with realistic $\pm 4\%$ irradiance jitter. |
+| **Time-Series Charts** | Responsive Analytics | Multi-series historical plots ($24\text{h}$, $7\text{d}$, $30\text{d}$) with automatic adaptive server-side downsampling. |
+| **Data Export** | Streaming CSV | High-throughput streaming CSV exports with UTF-8 BOM encoding for seamless Microsoft Excel compatibility. |
+| **Security** | Secure Ingestion | Device-bound API tokens, session-based authentication, and protected admin endpoints. |
 
 ---
 
-## 🛠️ Hardware Connection & Wiring Schematic
+## 🔌 Hardware Schematic & Pinout
 
-### 1. Pin Mapping Table
+### NodeMCU (ESP8266) Wiring Map
 
-| Component | Component Pin | NodeMCU (ESP8266) Pin | Description |
+```
+                +---------------------+
+                |   ESP8266 NodeMCU   |
+                |                     |
+   3.3V --------| 3V3             VIN |-------- TP4056 OUT+ (4.2V - 5V)
+    GND --------| GND             GND |-------- Common System Ground
+ BME SCL -------| D1 (GPIO 5)     RST |---+---- Deep Sleep Trigger
+ BME SDA -------| D2 (GPIO 4)     D0  |---+     (GPIO 16)
+TP CHRG --------| D5 (GPIO 14)        |
+TP STDBY -------| D6 (GPIO 12)        |
+DHT DATA -------| D7 (GPIO 13)        |
+Divider Out ----| A0 (ADC0)           |
+                +---------------------+
+```
+
+### Complete Pin Assignment Table
+
+| Module | Module Pin | ESP8266 Pin | Function / Logic |
 | :--- | :--- | :--- | :--- |
-| **BME280** | `VCC` | `3V3` | 3.3V Power Rail |
-| | `GND` | `GND` | Common System Ground |
-| | `SCL` | `D1` (GPIO 5) | I2C Clock Line |
+| **Bosch BME280** | `VCC` / `GND` | `3V3` / `GND` | Regulated 3.3V supply and common ground |
+| | `SCL` | `D1` (GPIO 5) | I2C Clock Line (Standard 100kHz / 400kHz) |
 | | `SDA` | `D2` (GPIO 4) | I2C Data Line |
-| **DHT11** | `VCC` | `3V3` | 3.3V Power Rail |
-| | `GND` | `GND` | Common System Ground |
-| | `DATA` | `D7` (GPIO 13) | Digital One-Wire Sensor Bus |
-| **TP4056** | `IN+` / `IN-` | Solar Panel (+ / -) | Positive & Negative 3W Solar Input |
-| | `BAT+` / `BAT-` | 18650 (+ / -) | 3.7V Li-ion Battery Terminals |
-| | `OUT+` | `VIN` | Regulated System Input Voltage |
-| | `OUT-` | `GND` | Common System Ground |
-| | `CHRG` (Pin 7) | `D5` (GPIO 14) | Active LOW when battery is charging |
-| | `STDBY` (Pin 6) | `D6` (GPIO 12) | Active LOW when battery is full |
-| **Divider** | `BAT+` $\rightarrow$ `220kΩ` | `A0` (ADC0) | Scaled voltage divider input |
-| | `A0` $\rightarrow$ `100kΩ` | `GND` | Ground pull-down resistor |
-| **Deep Sleep** | `D0` (GPIO 16) | `RST` | Hardware wake-up trigger *(Disconnect when flashing)* |
+| **DHT11 Sensor** | `VCC` / `GND` | `3V3` / `GND` | Redundant backup sensor power |
+| | `DATA` | `D7` (GPIO 13) | One-Wire digital bus with 10kΩ pull-up |
+| **TP4056 Charger** | `IN+` / `IN-` | Solar Panel (+ / -) | 5V / 3W Monocrystalline PV input |
+| | `BAT+` / `BAT-` | 18650 Battery (+ / -)| 3.7V Lithium-ion cell |
+| | `OUT+` / `OUT-` | `VIN` / `GND` | System power feed to ESP8266 internal LDO |
+| | `CHRG` (Pin 7) | `D5` (GPIO 14) | Active LOW when battery is actively charging |
+| | `STDBY` (Pin 6) | `D6` (GPIO 12) | Active LOW when battery charging is complete |
+| **Voltage Divider** | `BAT+` $\rightarrow$ `220kΩ` | `A0` (ADC0) | Scaled cell voltage ($3.0\text{V} - 4.2\text{V} \to 0.93\text{V} - 1.31\text{V}$) |
+| | `A0` $\rightarrow$ `100kΩ` | `GND` | Pull-down leg of the voltage divider |
+| **Deep Sleep Link**| `D0` (GPIO 16) | `RST` | RTC alarm pull-down line to wake MCU |
 
-> [!WARNING]
-> Always **disconnect the jumper wire between `D0` and `RST`** while flashing the ESP8266 over USB, otherwise the microcontroller cannot be reset by the programmer.
+> [!CAUTION]
+> **Flashing Precaution:** Disconnect the jumper between **`D0`** and **`RST`** when uploading firmware via USB. Having this connected holds the reset circuit and blocks UART programming.
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
-- **PHP:** `^8.3` (with `pdo`, `mbstring`, `openssl`, `curl`, `sqlite3` or `mysql` extensions)
+### System Requirements
+- **PHP:** `^8.3` (extensions: `pdo_mysql` or `pdo_sqlite`, `mbstring`, `openssl`, `curl`)
 - **Composer:** `^2.x`
 - **Node.js:** `^20.x` & **npm:** `^10.x`
-- **Database:** MySQL / MariaDB or SQLite
+- **Database:** MySQL 8.0+ or SQLite 3
 
-### 1. Clone the Repository
+### 1. Clone & Install Dependencies
 ```bash
 git clone https://github.com/niteshk700/solar.git
 cd solar
-```
 
-### 2. Install Dependencies
-```bash
 # Install PHP dependencies
-composer install
+composer install --no-dev --optimize-autoloader
 
-# Install front-end dependencies
+# Install front-end dependencies & build assets
 npm install
+npm run build
 ```
 
-### 3. Environment Configuration
-Copy the sample environment file and generate a unique application key:
+### 2. Configure Environment
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-Configure your database connection in `.env`:
+Adjust your `.env` configuration file:
 ```ini
-# For SQLite (default zero-config setup):
-DB_CONNECTION=sqlite
+APP_NAME="Solar IoT Weather Platform"
+APP_ENV=local
+APP_DEBUG=false
+APP_URL=http://localhost:8000
 
-# OR for MySQL:
+# Database Configuration (MySQL recommended for production)
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=solar
 DB_USERNAME=root
-DB_PASSWORD=
+DB_PASSWORD=your_password
 ```
 
-### 4. Database Setup & Seeding
-Run migrations and seed the initial administrator and default device records:
+### 3. Run Migrations & Seed Default Data
 ```bash
-# If using SQLite, ensure the file exists:
-touch database/database.sqlite
-
-# Run migrations and default seeders
 php artisan migrate --seed
 ```
 
-Default credentials created by the seeder:
-- **Email:** `admin@solar.yourdev.in`
-- **Password:** `admin123`
-- **Default Device ID:** `solar_data_collector_v1`
-- **Default Device API Key:** `SolarDataCollectionV1`
+> [!NOTE]
+> **Default Admin Credentials:**
+> - **URL:** `http://localhost:8000/login`
+> - **Email:** `admin@solar.yourdev.in`
+> - **Password:** `admin123`
+> - **Default Device ID:** `solar_data_collector_v1`
+> - **Device API Key:** `SolarDataCollectionV1`
 
-### 5. Build Assets & Launch Development Server
+### 4. Start the Application
 ```bash
-# Build front-end assets
-npm run build
-
-# Start the Laravel application server
 php artisan serve
 ```
-
-Visit **`http://localhost:8000`** in your browser to log in and view the dashboard.
+Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## 📡 REST API Reference
+## 📡 REST API Documentation
 
-### 1. Telemetry Ingestion Endpoint
-Accepts environmental measurements and operational status from edge nodes.
+### 1. Telemetry Ingestion
+Transmit real-time telemetry from edge devices to the platform.
 
-- **Endpoint:** `POST /api/weather-data`
-- **Headers:** `Content-Type: application/json`
+```http
+POST /api/weather-data
+Content-Type: application/json
+```
 
 #### Request Payload
 ```json
 {
   "api_key": "SolarDataCollectionV1",
   "device_id": "solar_data_collector_v1",
-  "temperature": 28.4,
-  "humidity": 55.2,
-  "pressure": 1013.2,
-  "battery": 4.12,
-  "rssi": -62,
+  "temperature": 27.85,
+  "humidity": 58.40,
+  "pressure": 1012.65,
+  "battery": 4.14,
+  "rssi": -65,
   "bme_status": true,
   "dht_status": true,
   "solar_status": "charging"
@@ -220,10 +254,30 @@ Accepts environmental measurements and operational status from edge nodes.
 }
 ```
 
+#### Example cURL Request
+```bash
+curl -X POST http://localhost:8000/api/weather-data \
+  -H "Content-Type: application/json" \
+  -d '{
+    "api_key": "SolarDataCollectionV1",
+    "device_id": "solar_data_collector_v1",
+    "temperature": 27.85,
+    "humidity": 58.4,
+    "pressure": 1012.65,
+    "battery": 4.14,
+    "rssi": -65,
+    "bme_status": true,
+    "dht_status": true,
+    "solar_status": "charging"
+  }'
+```
+
 ---
 
 ### 2. Fetch Latest Device Telemetry
-- **Endpoint:** `GET /api/device/{id}/latest`
+```http
+GET /api/device/{device_id}/latest
+```
 
 #### Response (`200 OK`)
 ```json
@@ -233,14 +287,14 @@ Accepts environmental measurements and operational status from edge nodes.
     "device_id": "solar_data_collector_v1",
     "device_name": "Solar Data Collector v1",
     "status": "active",
-    "last_seen": "2026-11-17T15:30:00+05:30"
+    "last_seen": "2026-11-17T15:45:00+05:30"
   },
   "data": {
-    "temperature": 28.4,
-    "humidity": 55.2,
-    "pressure": 1013.2,
-    "battery": 4.12,
-    "rssi": -62,
+    "temperature": 27.85,
+    "humidity": 58.4,
+    "pressure": 1012.65,
+    "battery": 4.14,
+    "rssi": -65,
     "solar_status": "charging"
   }
 }
@@ -248,84 +302,115 @@ Accepts environmental measurements and operational status from edge nodes.
 
 ---
 
-### 3. Fetch Historical Device Telemetry
-- **Endpoint:** `GET /api/device/{id}/history?hours=24`
-- **Query Parameters:**
-  - `hours`: Integer ($1$ to $720$, default: $24$)
+### 3. Fetch Historical Device Data
+```http
+GET /api/device/{device_id}/history?hours=24
+```
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `hours` | `integer` | `24` | Historical window in hours (range: $1$ to $720$) |
 
 ---
 
-## 💾 Firmware Installation (Arduino IDE)
+## 💾 Firmware Guide
 
-The firmware is located in [`firmware/solar_bme280_firmware/solar_bme280_firmware.ino`](file:///Users/niteshkumar/Desktop/Solar/firmware/solar_bme280_firmware/solar_bme280_firmware.ino).
+The edge firmware is located in [`firmware/solar_bme280_firmware/solar_bme280_firmware.ino`](firmware/solar_bme280_firmware/solar_bme280_firmware.ino).
 
 ### Required Arduino Libraries
-Install the following libraries via the Arduino Library Manager (`Ctrl + Shift + I` / `Cmd + Shift + I`):
-1. **Adafruit BME280 Library** by Adafruit
-2. **Adafruit Unified Sensor** by Adafruit
-3. **DHT sensor library** by Adafruit
-4. **ArduinoJson** (Version 6.x / 7.x) by Benoit Blanchon
-5. **WiFiManager** by tzapu
+Install via the Arduino Library Manager (`Ctrl + Shift + I` / `Cmd + Shift + I`):
+1. **Adafruit BME280 Library** (by Adafruit)
+2. **Adafruit Unified Sensor** (by Adafruit)
+3. **DHT sensor library** (by Adafruit)
+4. **ArduinoJson** (v6.x or v7.x by Benoit Blanchon)
+5. **WiFiManager** (by tzapu)
 
-### Flashing Steps
-1. Open `firmware/solar_bme280_firmware/solar_bme280_firmware.ino`.
-2. Update `DEVICE_ID`, `API_KEY`, and `SERVER_URL` with your server address.
-3. Select board: **NodeMCU 1.0 (ESP-12E Module)**.
-4. Ensure the `D0` to `RST` wire is disconnected.
-5. Connect USB and click **Upload**.
-6. On first boot, connect your smartphone or laptop to the WiFi AP **`Solar_Weather_Setup`** to enter your local network credentials via the captive portal.
+### Flash & Provisioning Steps
+1. Open the `.ino` file in the Arduino IDE.
+2. Update the configuration constants:
+   ```cpp
+   const char* serverUrl = "http://your-server-ip:8000/api/weather-data";
+   const char* deviceId  = "solar_data_collector_v1";
+   const char* apiKey    = "SolarDataCollectionV1";
+   ```
+3. Set your target board to **NodeMCU 1.0 (ESP-12E Module)** with default flash settings ($80\text{MHz}$, $4\text{MB}$ flash).
+4. Verify that `D0` to `RST` wire is **unplugged**. Connect the USB cable and click **Upload**.
+5. Once flashed, reconnect `D0` to `RST` for deep sleep support.
+6. Connect to the initial captive portal hotspot named **`Solar_Weather_Setup`** on your smartphone/laptop and submit your local WiFi credentials.
 
 ---
 
-## 📂 Repository Structure
+## 🗂️ Project Structure
 
 ```text
 ├── app/
 │   ├── Http/Controllers/
-│   │   ├── ApiController.php           # Ingestion and telemetry REST API
-│   │   ├── AuthController.php          # Session authentication & login
-│   │   ├── DashboardController.php     # Real-time dashboard & CSV streaming
-│   │   ├── DeviceController.php        # Device CRUD & Chart.js analytics
-│   │   └── SettingsController.php      # Password & API token management
+│   │   ├── ApiController.php          # REST ingestion and retrieval endpoints
+│   │   ├── AuthController.php         # Authentication and session control
+│   │   ├── DashboardController.php    # Live control center & CSV exports
+│   │   ├── DeviceController.php       # Hardware node CRUD & time-series analytics
+│   │   └── SettingsController.php     # Profile security & API key generation
 │   ├── Models/
-│   │   ├── Device.php                  # IoT device entity
-│   │   ├── WeatherLog.php              # Time-series telemetry records
-│   │   └── ApiToken.php                # Access token storage
+│   │   ├── Device.php                 # Registered hardware node model
+│   │   ├── WeatherLog.php             # Raw time-series telemetry records
+│   │   └── ApiToken.php               # Hashed REST API tokens
 │   └── Services/
-│       └── SolarSimulationService.php  # Solar generation mathematical engine
+│       └── SolarSimulationService.php # Diurnal solar yield mathematical model
 ├── database/
-│   ├── migrations/                     # Database schema definitions
-│   └── seeders/                        # Default admin & device seeders
+│   ├── migrations/                    # Database table schemas
+│   └── seeders/                       # Default admin and telemetry node seeds
 ├── firmware/
 │   └── solar_bme280_firmware/
-│       └── solar_bme280_firmware.ino   # Complete ESP8266 C++ firmware
+│       └── solar_bme280_firmware.ino  # Embedded ESP8266 C++ firmware
 ├── public/
-│   ├── css/style.css                   # Glassmorphic UI styles
-│   ├── manifest.json                   # PWA manifest
-│   └── sw.js                           # Progressive Web App service worker
+│   ├── icons/                         # Platform logos and PWA iconography
+│   ├── manifest.json                  # PWA application manifest
+│   └── sw.js                          # Service worker background cache
 ├── resources/
 │   └── views/
-│       ├── auth/                       # Login authentication views
-│       ├── dashboard/                  # Main telemetry overview
-│       ├── devices/                    # Device inventory & telemetry charts
-│       └── layouts/                    # App shell with PWA integration
+│       ├── auth/                      # Sleek monochrome login views
+│       ├── dashboard/                 # Dynamic live control center
+│       ├── devices/                   # Device manager & analytics charts
+│       └── layouts/                   # Master app shell
 ├── routes/
-│   ├── api.php                         # Telemetry ingestion routes
-│   └── web.php                         # Web application routes
-└── vite.config.js                      # Asset bundler configuration
+│   ├── api.php                        # Ingestion and telemetry REST routes
+│   └── web.php                        # Web platform authenticated routes
+└── tests/
+    └── Feature/                       # Automated integration & feature tests
 ```
 
 ---
 
-## 🧪 Testing
+## 🧪 Test Suite
 
-Run the automated test suite using Artisan:
+The platform includes automated feature test coverage ensuring route authentication, device management, and telemetry integrity remain robust.
+
 ```bash
 php artisan test
+```
+
+Expected output:
+```text
+PASS  Tests\Feature\ExampleTest
+✓ login screen can be rendered
+✓ user can authenticate using the login screen
+✓ guest is redirected to login from dashboard
+✓ authenticated user can access dashboard
+✓ authenticated user can view devices page
+✓ authenticated user can view settings page
+
+Tests:    6 passed (7 assertions)
+Duration: 0.14s
 ```
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for complete details.
+
+---
+
+<p align="center">
+  Crafted for <strong>Nitra Technical Campus Solar IoT Portal</strong> &bull; Developed by <a href="https://github.com/niteshk700">Nitesh Kumar</a>
+</p>

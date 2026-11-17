@@ -81,21 +81,20 @@
         color: rgba(148, 163, 184, 0.9);
     }
     #pwa-install-banner .pwa-install-btn {
-        background: linear-gradient(135deg, #3B82F6, #6366f1);
-        color: #fff;
-        border: none;
+        background: var(--text-primary);
+        color: var(--card-bg);
+        border: 1px solid var(--text-primary);
         border-radius: 10px;
         padding: 10px 18px;
         font-size: 0.85rem;
         font-weight: 600;
         cursor: pointer;
         flex-shrink: 0;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        transition: transform 0.2s, opacity 0.2s;
     }
     #pwa-install-banner .pwa-install-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        opacity: 0.9;
     }
     #pwa-install-banner .pwa-dismiss-btn {
         background: transparent;
@@ -123,12 +122,14 @@
             <div class="container-xl">
                 <!-- Branding Brand & Logo -->
                 <a href="{{ route('dashboard') }}" class="navbar-brand-custom">
-                    <div style="background: #ffffff; padding: 3px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                        <img src="https://nitra.ac.in/wp-content/uploads/2024/08/cropped-cropped-Untitled-design-7.png" alt="Nitra Logo"
+                    <div style="background: var(--card-bg); padding: 4px; border-radius: 10px; border: 1px solid var(--card-border); overflow: hidden; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; box-shadow: var(--glass-shadow);">
+                        <img src="{{ asset('icons/logo.png') }}" alt="Solar Logo"
                              style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
                     </div>
-                    <span class="d-none d-sm-inline text-primary">Nitra Technical Campus <span class="text-warning">Solar Portal</span></span>
-                    <span class="d-inline d-sm-none text-warning">Solar</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold tracking-tight text-primary">Solar Telemetry</span>
+                        <span class="d-none d-md-inline-block px-2 py-0.5 rounded-pill text-muted font-monospace" style="font-size: 0.68rem; border: 1px solid var(--card-border); background: var(--sidebar-active);">Control Center</span>
+                    </div>
                 </a>
 
                 <!-- Collapsible Navigation Links (Centered) -->
@@ -204,20 +205,20 @@
                 <!-- Page-specific dynamic contents -->
                 @yield('content')
 
-                <!-- Branded Academic Footer -->
+                <!-- Branded Modern Monochrome Footer -->
                 <footer class="mt-5 mb-4 text-secondary" style="font-size: 0.75rem; opacity: 0.85;">
-                    <hr style="border-top: 1px solid var(--glass-border); margin-bottom: 20px;">
+                    <hr style="border-top: 1px solid var(--card-border); margin-bottom: 20px;">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                         <div>
-                            © 2026 <strong class="text-black">Nitra Technical Campus</strong>. All Rights Reserved.
+                            &copy; 2026 <strong class="text-primary">Solar IoT Telemetry Platform</strong>. All Rights Reserved.
                         </div>
                         <div class="text-muted">
-                            Developed by <span class="text-warning fw-semibold">Department of Computer Science and Engineering</span>
+                            Nitra Technical Campus &bull; Department of Computer Science & Engineering
                         </div>
                         <div class="d-flex gap-3">
-                            <a href="https://nitra.ac.in" target="_blank" class="text-secondary text-decoration-none hover-warning" style="transition: color 0.2s;">nitra.ac.in</a>
-                            <span>•</span>
-                            <a href="#" class="text-secondary text-decoration-none">System Status</a>
+                            <a href="https://nitra.ac.in" target="_blank" class="text-secondary text-decoration-none" style="transition: color 0.2s;">nitra.ac.in</a>
+                            <span>&bull;</span>
+                            <span class="text-muted">System Operational</span>
                         </div>
                     </div>
                 </footer>

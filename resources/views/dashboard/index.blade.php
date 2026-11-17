@@ -4,57 +4,48 @@
 
 @section('content')
 <style>
-/* Sleek glassmorphic card refinements & animations */
+/* Sleek monochrome card refinements & subtle hover */
 .glass-card {
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
     position: relative;
     overflow: hidden;
 }
-.glass-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0) 100%);
-    transform: skewX(-25deg);
-    transition: 0.75s;
-}
-.glass-card:hover::before {
-    left: 150%;
-}
 @media (min-width: 769px) {
     .glass-card:hover {
-        transform: translateY(-4px) scale(1.008);
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 0 1px rgba(255, 255, 255, 0.25) !important;
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow) !important;
+        border-color: var(--text-muted) !important;
     }
 }
-/* Neon status pulses */
+/* Monochrome status pulse */
 .pulse-online {
-    background: #10B981 !important;
-    box-shadow: 0 0 10px #10B981;
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-primary) !important;
+    box-shadow: 0 0 6px rgba(125, 125, 125, 0.3);
 }
 .pulse-offline {
-    background: #EF4444 !important;
-    box-shadow: 0 0 10px #EF4444;
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted) !important;
+    box-shadow: none;
 }
-/* Value update flash cues */
+/* Value update flash cue */
 @keyframes pop-flash {
-    0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.08); filter: brightness(1.4); }
-    100% { transform: scale(1); filter: brightness(1); }
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
 }
 .flash-update {
-    animation: pop-flash 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: pop-flash 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     display: inline-block;
 }
-/* Interactive chart override */
-#liveTelemetryChart {
-    filter: drop-shadow(0px 8px 24px rgba(59, 130, 246, 0.1));
-}
 .chart-card {
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid var(--card-border) !important;
 }
 
 /* ==========================================
@@ -144,34 +135,32 @@
 <div class="content-header">
     <div>
         <h2 class="content-title d-flex flex-wrap align-items-center gap-2">
-            <span>Control Center Dashboard</span>
-            <span class="badge bg-warning text-dark font-heading fw-bold" style="font-size: 0.65rem; border-radius: 6px; padding: 4px 8px; vertical-align: middle;">
-                NITRA TECHNICAL CAMPUS
+            <span>Control Center</span>
+            <span class="badge font-heading" style="font-size: 0.68rem; border-radius: 9999px; padding: 4px 10px; background: var(--sidebar-active); border: 1px solid var(--card-border); color: var(--text-secondary); font-weight: 500; letter-spacing: 0.02em;">
+                SOLAR IOT PLATFORM
             </span>
         </h2>
-        <p class="content-subtitle">Real-time solar telemetry and environmental insights from Nitra Technical Campus</p>
+        <p class="content-subtitle">Real-time solar telemetry and environmental insights</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <button id="btn-force-sync" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
+        <button id="btn-force-sync" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 9px 16px;">
             <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
             <span>Force Sync</span>
         </button>
-        <a href="{{ route('dashboard.export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
-            <i class="fa-solid fa-file-csv text-success"></i>
-            <span>Export Excel</span>
+        <a href="{{ route('dashboard.export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 9px 16px;">
+            <i class="fa-regular fa-file-lines"></i>
+            <span>Export CSV</span>
         </a>
-        <a href="{{ route('dashboard.solar-export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
-            <i class="fa-solid fa-solar-panel text-warning"></i>
-            <span>Export Solar Logs</span>
+        <a href="{{ route('dashboard.solar-export') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 9px 16px;">
+            <i class="fa-solid fa-solar-panel"></i>
+            <span>Solar Logs</span>
         </a>
-        <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 10px 18px;">
+        <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 9px 16px;">
             <i class="fa-solid fa-plus"></i>
             <span>Manage Devices</span>
         </a>
     </div>
 </div>
-
-
 
 <!-- Aggregated Metrics Grid -->
 <div class="stats-grid">
@@ -179,11 +168,11 @@
     <div class="glass-card p-4 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Temperature</span>
-            <div class="stat-card-value text-danger" id="avg-temp">{{ isset($stats['avg_temp']) ? $stats['avg_temp'] . '°C' : '--' }}</div>
+            <div class="stat-card-value text-primary" id="avg-temp">{{ isset($stats['avg_temp']) ? $stats['avg_temp'] . '°C' : '--' }}</div>
             <span class="text-muted small">Across active nodes</span>
         </div>
-        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--secondary);">
-            <i class="fa-solid fa-temperature-half" style="font-size: 1.5rem;"></i>
+        <div class="stat-icon" style="background: var(--sidebar-active); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--card-border);">
+            <i class="fa-solid fa-temperature-half" style="font-size: 1.3rem;"></i>
         </div>
     </div>
 
@@ -194,8 +183,8 @@
             <div class="stat-card-value text-primary" id="avg-hum">{{ isset($stats['avg_hum']) ? $stats['avg_hum'] . '%' : '--' }}</div>
             <span class="text-muted small">Relative air moisture</span>
         </div>
-        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
-            <i class="fa-solid fa-droplet" style="font-size: 1.5rem;"></i>
+        <div class="stat-icon" style="background: var(--sidebar-active); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--card-border);">
+            <i class="fa-solid fa-droplet" style="font-size: 1.3rem;"></i>
         </div>
     </div>
 
@@ -203,11 +192,11 @@
     <div class="glass-card p-4 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Air Pressure</span>
-            <div class="stat-card-value text-info" id="avg-press">{{ isset($stats['avg_press']) ? $stats['avg_press'] . ' hPa' : '--' }}</div>
+            <div class="stat-card-value text-primary" id="avg-press">{{ isset($stats['avg_press']) ? $stats['avg_press'] . ' hPa' : '--' }}</div>
             <span class="text-muted small">Sea-level adjusted</span>
         </div>
-        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--info);">
-            <i class="fa-solid fa-gauge-high" style="font-size: 1.5rem;"></i>
+        <div class="stat-icon" style="background: var(--sidebar-active); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--card-border);">
+            <i class="fa-solid fa-gauge-high" style="font-size: 1.3rem;"></i>
         </div>
     </div>
 
@@ -215,7 +204,7 @@
     <div class="glass-card p-4 d-flex align-items-center justify-content-between">
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Battery Cell</span>
-            <div class="stat-card-value text-success" id="avg-battery">
+            <div class="stat-card-value text-primary" id="avg-battery">
                 @if(isset($stats['avg_battery']))
                     {{ $stats['avg_battery'] }}V 
                     <span style="font-size: 0.95rem; font-weight: 500;" class="text-secondary">
@@ -233,8 +222,8 @@
             </div>
             <span class="text-muted small">Solar charging state</span>
         </div>
-        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
-            <i class="fa-solid fa-battery-three-quarters" style="font-size: 1.5rem;"></i>
+        <div class="stat-icon" style="background: var(--sidebar-active); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--card-border);">
+            <i class="fa-solid fa-battery-three-quarters" style="font-size: 1.3rem;"></i>
         </div>
     </div>
 </div>
@@ -242,18 +231,18 @@
 <!-- 100kW Live Solar Generation Panel -->
 <div class="row mb-4">
     <div class="col-12">
-        <div class="glass-card p-4 border-premium-accent" style="border: 1px solid rgba(245, 158, 11, 0.25) !important;">
+        <div class="glass-card p-4" style="border: 1px solid var(--card-border) !important;">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
                 <div>
-                    <h3 class="h5 font-heading fw-bold m-0 d-flex align-items-center gap-2 text-warning">
+                    <h3 class="h5 font-heading fw-bold m-0 d-flex align-items-center gap-2 text-primary">
                         <i class="fa-solid fa-solar-panel"></i>
-                        <span>100kW Solar Meter - System Generated</span>
+                        <span>100kW Solar Meter &bull; Simulated Feeds</span>
                     </h3>
-                    <p class="text-muted small m-0">Synchronized simulated live solar grid feeds</p>
+                    <p class="text-muted small m-0">Synchronized diurnal telemetry and generation analytics</p>
                 </div>
                 <div>
-                    <span class="badge form-control-glass text-warning px-2.5 py-1.5 small" id="solar-status-badge">
-                        <span class="pulse-online me-1.5" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #F59E0B !important; box-shadow: 0 0 10px #F59E0B;"></span>LIVE METER ACTIVE
+                    <span class="badge px-3 py-1.5 small" id="solar-status-badge" style="background: var(--sidebar-active); border: 1px solid var(--card-border); color: var(--text-primary); border-radius: 9999px; font-weight: 500;">
+                        <span class="pulse-online me-1.5" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text-primary) !important;"></span>LIVE METER
                     </span>
                 </div>
             </div>
@@ -262,17 +251,17 @@
             <div class="row g-3 mb-4 text-center">
                 <!-- Active Power -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: rgba(245, 158, 11, 0.04);">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                         <div class="text-muted small mb-1" style="font-size: 0.75rem;">Active Power</div>
-                        <div class="fw-bold text-warning h4 m-0" id="solar-active-power">
+                        <div class="fw-bold text-primary h4 m-0" id="solar-active-power">
                             {{ number_format($solarStats['active_power'], 2) }} kW
                         </div>
-                        <span class="text-muted small" style="font-size: 0.65rem;"><i class="fa-solid fa-bolt text-warning me-1"></i>Live feed</span>
+                        <span class="text-muted small" style="font-size: 0.65rem;">Live feed</span>
                     </div>
                 </div>
                 <!-- Gen Today -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: rgba(59, 130, 246, 0.04);">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                         <div class="text-muted small mb-1" style="font-size: 0.75rem;">Gen (kWh)</div>
                         <div class="fw-bold text-primary h4 m-0" id="solar-gen-today">
                             {{ number_format($solarStats['gen_today'], 2) }}
@@ -282,9 +271,9 @@
                 </div>
                 <!-- Specific Yield -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                         <div class="text-muted small mb-1" style="font-size: 0.75rem;">Specific Yield</div>
-                        <div class="fw-bold text-info h4 m-0" id="solar-sy">
+                        <div class="fw-bold text-primary h4 m-0" id="solar-sy">
                             {{ number_format($solarStats['sy'], 2) }}
                         </div>
                         <span class="text-muted small" style="font-size: 0.65rem;">kWh/kWp</span>
@@ -292,19 +281,19 @@
                 </div>
                 <!-- CO2 Reduction -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                         <div class="text-muted small mb-1" style="font-size: 0.75rem;">CO2 (Tonnes)</div>
-                        <div class="fw-bold text-success h4 m-0" id="solar-co2">
+                        <div class="fw-bold text-primary h4 m-0" id="solar-co2">
                             {{ number_format($solarStats['co2'], 2) }}
                         </div>
-                        <span class="text-muted small" style="font-size: 0.65rem;">Saved weight</span>
+                        <span class="text-muted small" style="font-size: 0.65rem;">Saved carbon</span>
                     </div>
                 </div>
                 <!-- CUF -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px;">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                         <div class="text-muted small mb-1" style="font-size: 0.75rem;">CUF (%)</div>
-                        <div class="fw-bold text-accent h4 m-0" id="solar-cuf">
+                        <div class="fw-bold text-primary h4 m-0" id="solar-cuf">
                             {{ number_format($solarStats['cuf'] * 100, 2) }}%
                         </div>
                         <span class="text-muted small" style="font-size: 0.65rem;">Capacity factor</span>
@@ -312,9 +301,9 @@
                 </div>
                 <!-- Grid / DG Status -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: rgba(255,255,255,0.02);">
+                    <div class="p-3 form-control-glass border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                         <div class="text-muted small mb-1" style="font-size: 0.7rem; line-height: 1.1;">Grid / DG (kW)</div>
-                        <div class="fw-semibold text-secondary m-0" style="font-size: 1.15rem;">
+                        <div class="fw-semibold text-primary m-0" style="font-size: 1.15rem;">
                             0.00 / 0.00
                         </div>
                         <span class="text-muted small" style="font-size: 0.65rem;">Standard inputs</span>
@@ -339,13 +328,13 @@
     <div class="col-12 mb-4">
         <div class="glass-card p-4 chart-card">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                <h3 class="h5 font-heading fw-bold m-0 d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-chart-line text-primary"></i>
+                <h3 class="h5 font-heading fw-bold m-0 d-flex align-items-center gap-2 text-primary">
+                    <i class="fa-solid fa-chart-line"></i>
                     <span>Real-Time Environmental Stream</span>
                 </h3>
                 <div>
-                    <span class="badge form-control-glass text-secondary px-2.5 py-1.5 small" id="chart-pulse-badge">
-                        <span class="pulse-online me-1.5" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%;"></span>LIVE STREAMING
+                    <span class="badge px-3 py-1.5 small" id="chart-pulse-badge" style="background: var(--sidebar-active); border: 1px solid var(--card-border); color: var(--text-primary); border-radius: 9999px; font-weight: 500;">
+                        <span class="pulse-online me-1.5" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text-primary) !important;"></span>LIVE STREAMING
                     </span>
                 </div>
             </div>
@@ -357,8 +346,8 @@
 
     <!-- Active Solar Nodes Grid -->
     <div class="col-xl-8 col-lg-12 mb-4">
-        <h3 class="h5 font-heading fw-bold mb-3 d-flex align-items-center gap-2">
-            <i class="fa-solid fa-tower-broadcast text-primary"></i>
+        <h3 class="h5 font-heading fw-bold mb-3 d-flex align-items-center gap-2 text-primary">
+            <i class="fa-solid fa-tower-broadcast"></i>
             <span>Registered Hardware Nodes ({{ $stats['total_devices'] }})</span>
         </h3>
         
@@ -370,13 +359,13 @@
                         <div>
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
-                                    <h4 class="h6 font-heading fw-bold mb-1">{{ $device->device_name }}</h4>
-                                    <span class="badge form-control-glass text-secondary px-2.5 py-1.5 small">{{ $device->device_id }}</span>
+                                    <h4 class="h6 font-heading fw-bold mb-1 text-primary">{{ $device->device_name }}</h4>
+                                    <span class="badge form-control-glass text-secondary px-2.5 py-1 small font-monospace">{{ $device->device_id }}</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2 dev-online-badge">
                                     @if($device->is_online)
                                         <span class="pulse-online"></span>
-                                        <span class="text-secondary small fw-semibold">ONLINE</span>
+                                        <span class="text-primary small fw-semibold">ONLINE</span>
                                     @else
                                         <span class="pulse-offline"></span>
                                         <span class="text-muted small fw-semibold">OFFLINE</span>
@@ -390,15 +379,15 @@
                                     <!-- Core Meteorological Data -->
                                     <div class="row g-2 text-center mb-4 mt-3">
                                         <div class="col-4">
-                                            <div class="p-2 form-control-glass border-0" style="border-radius: 8px;">
+                                            <div class="p-2 form-control-glass border-0" style="border-radius: 8px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                                                 <div class="text-muted small" style="font-size: 0.72rem;">Temp</div>
-                                                <div class="fw-bold text-danger dev-temp">
+                                                <div class="fw-bold text-primary dev-temp">
                                                     {{ !is_null($device->latest_log->temperature) ? $device->latest_log->temperature . '°C' : '--' }}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-4">
-                                            <div class="p-2 form-control-glass border-0" style="border-radius: 8px;">
+                                            <div class="p-2 form-control-glass border-0" style="border-radius: 8px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                                                 <div class="text-muted small" style="font-size: 0.72rem;">Humidity</div>
                                                 <div class="fw-bold text-primary dev-hum">
                                                     {{ !is_null($device->latest_log->humidity) ? $device->latest_log->humidity . '%' : '--' }}
@@ -406,9 +395,9 @@
                                             </div>
                                         </div>
                                         <div class="col-4">
-                                            <div class="p-2 form-control-glass border-0" style="border-radius: 8px;">
+                                            <div class="p-2 form-control-glass border-0" style="border-radius: 8px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important;">
                                                 <div class="text-muted small" style="font-size: 0.72rem;">Pressure</div>
-                                                <div class="fw-bold text-info dev-press" style="font-size: 0.88rem; padding: 1.5px 0;">
+                                                <div class="fw-bold text-primary dev-press" style="font-size: 0.88rem; padding: 1.5px 0;">
                                                     {{ !is_null($device->latest_log->pressure) ? round($device->latest_log->pressure) . ' hPa' : '--' }}
                                                 </div>
                                             </div>
@@ -424,15 +413,11 @@
                                                 if ($device->latest_log->battery >= 4.2) $batPct = 100;
                                                 elseif ($device->latest_log->battery <= 3.5) $batPct = 0;
                                                 else $batPct = round((($device->latest_log->battery - 3.5) / 0.7) * 100);
-
-                                                $batColor = 'var(--accent)';
-                                                if ($batPct < 20) $batColor = 'var(--danger)';
-                                                elseif ($batPct < 50) $batColor = 'var(--warning)';
                                             @endphp
-                                            <span class="fw-semibold text-secondary dev-battery-pct">{{ $batPct }}%</span>
+                                            <span class="fw-semibold text-primary dev-battery-pct">{{ $batPct }}%</span>
                                         </div>
-                                        <div class="progress-bar-custom">
-                                            <div class="progress-fill dev-battery-fill" style="width: {{ $batPct }}%; background: {{ $batColor }};"></div>
+                                        <div class="progress-bar-custom" style="background: var(--card-border);">
+                                            <div class="progress-fill dev-battery-fill" style="width: {{ $batPct }}%; background: var(--text-primary);"></div>
                                         </div>
                                     </div>
 
@@ -442,65 +427,65 @@
                                             @php
                                                 $rssi = $device->latest_log->rssi;
                                                 $rssiLabel = 'Excellent';
-                                                $rssiColor = 'var(--accent)';
                                                 $rssiPct = 100;
-
-                                                if ($rssi <= -90) { $rssiLabel = 'Critical'; $rssiColor = 'var(--danger)'; $rssiPct = 15; }
-                                                elseif ($rssi <= -80) { $rssiLabel = 'Poor'; $rssiColor = 'var(--warning)'; $rssiPct = 40; }
-                                                elseif ($rssi <= -70) { $rssiLabel = 'Good'; $rssiColor = 'var(--primary)'; $rssiPct = 70; }
+                                                if ($rssi <= -90) { $rssiLabel = 'Critical'; $rssiPct = 15; }
+                                                elseif ($rssi <= -80) { $rssiLabel = 'Poor'; $rssiPct = 40; }
+                                                elseif ($rssi <= -70) { $rssiLabel = 'Good'; $rssiPct = 70; }
                                             @endphp
-                                            <span class="fw-semibold dev-rssi-status" style="color: {{ $rssiColor }}">{{ $rssiLabel }}</span>
+                                            <span class="fw-semibold text-primary dev-rssi-status">{{ $rssiLabel }}</span>
                                         </div>
-                                        <div class="progress-bar-custom">
-                                            <div class="progress-fill dev-rssi-fill" style="width: {{ $rssiPct }}%; background: {{ $rssiColor }};"></div>
+                                        <div class="progress-bar-custom" style="background: var(--card-border);">
+                                            <div class="progress-fill dev-rssi-fill" style="width: {{ $rssiPct }}%; background: var(--text-primary);"></div>
                                         </div>
                                     </div>
 
                                     <!-- Component Diagnostic Panel -->
-                                    <div class="border-top pt-3 mt-3">
+                                    <div class="border-top pt-3 mt-3" style="border-color: var(--card-border) !important;">
                                         <span class="text-secondary small fw-semibold uppercase tracking-wider d-block mb-2" style="font-size: 0.75rem;">Component Statuses</span>
                                         <div class="row g-2">
                                             <!-- BME280 Status -->
                                             <div class="col-4">
-                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center border-0 text-center" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05); min-height: 52px;">
+                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center text-center" style="border-radius: 8px; background: var(--sidebar-active); min-height: 52px; border: 1px solid var(--card-border) !important;">
                                                     <span class="text-secondary small mb-1" style="font-size: 0.6rem; font-weight: 500;">BME280</span>
                                                     <span class="dev-bme-badge">
                                                         @if($device->latest_log->bme_status)
-                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);">OK</span>
                                                         @else
-                                                            <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: transparent; border-color: var(--text-muted) !important; color: var(--text-muted); border-style: dashed;">OFFLINE</span>
                                                         @endif
                                                     </span>
                                                 </div>
                                             </div>
                                             <!-- DHT11 Status -->
                                             <div class="col-4">
-                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center border-0 text-center" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05); min-height: 52px;">
+                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center text-center" style="border-radius: 8px; background: var(--sidebar-active); min-height: 52px; border: 1px solid var(--card-border) !important;">
                                                     <span class="text-secondary small mb-1" style="font-size: 0.6rem; font-weight: 500;">DHT11</span>
                                                     <span class="dev-dht-badge">
                                                         @if(isset($device->latest_log->dht_status) ? $device->latest_log->dht_status : true)
-                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);">OK</span>
                                                         @else
-                                                            <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: transparent; border-color: var(--text-muted) !important; color: var(--text-muted); border-style: dashed;">OFFLINE</span>
                                                         @endif
                                                     </span>
                                                 </div>
                                             </div>
                                             <!-- Charger State (TP4056 + Solar) -->
                                             <div class="col-4">
-                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center border-0 text-center" style="border-radius: 8px; background: rgba(100, 116, 139, 0.05); min-height: 52px;">
+                                                <div class="p-2 form-control-glass d-flex flex-column align-items-center justify-content-center text-center" style="border-radius: 8px; background: var(--sidebar-active); min-height: 52px; border: 1px solid var(--card-border) !important;">
                                                     <span class="text-secondary small mb-1" style="font-size: 0.6rem; font-weight: 500;">Solar</span>
                                                     <span class="dev-solar-badge">
                                                         @if($device->latest_log->solar_status === 'charging')
-                                                            <span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>
                                                         @elseif($device->latest_log->solar_status === 'full')
-                                                            <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>
                                                         @else
-                                                            <span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>
+                                                            <span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: transparent; border-color: var(--card-border) !important; color: var(--text-muted);"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>
                                                         @endif
                                                     </span>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
                                         </div>
                                     </div>
                                 @else
@@ -548,20 +533,20 @@
         <div class="glass-card p-4 h-100" style="max-height: 520px; overflow-y: auto;">
             <div class="d-flex flex-column gap-3" id="live-packet-stream">
                 @forelse($recentLogs as $log)
-                    <div class="form-control-glass p-3 border-0" style="border-radius: 12px; transition: var(--transition-smooth);">
+                    <div class="form-control-glass p-3 border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important; transition: var(--transition-smooth);">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="fw-bold small text-primary">{{ $log->device_name }}</span>
                             <span class="text-muted" style="font-size: 0.72rem;">{{ $log->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="row text-center g-1 text-secondary" style="font-size: 0.8rem;">
                             <div class="col-4">
-                                <i class="fa-solid fa-temperature-half me-1 text-danger"></i>{{ $log->temperature }}°
+                                <i class="fa-solid fa-temperature-half me-1 text-muted"></i>{{ $log->temperature }}°
                             </div>
                             <div class="col-4">
-                                <i class="fa-solid fa-droplet me-1 text-primary"></i>{{ $log->humidity }}%
+                                <i class="fa-solid fa-droplet me-1 text-muted"></i>{{ $log->humidity }}%
                             </div>
                             <div class="col-4">
-                                <i class="fa-solid fa-battery-three-quarters me-1 text-success"></i>{{ $log->battery }}V
+                                <i class="fa-solid fa-battery-three-quarters me-1 text-muted"></i>{{ $log->battery }}V
                             </div>
                         </div>
                     </div>
@@ -579,7 +564,7 @@
 <!-- Import Chart.js via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Modern AJAX Polling & Charting Engine -->
+<!-- Modern Monochrome AJAX Polling & Charting Engine -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const liveUrl = "{{ route('dashboard.live') }}";
@@ -590,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (el.innerText !== newValue) {
             el.innerText = newValue;
             el.classList.remove('flash-update');
-            void el.offsetWidth; // Trigger reflow to restart animation
+            void el.offsetWidth; // Trigger reflow
             el.classList.add('flash-update');
         }
     }
@@ -606,31 +591,47 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Theme-aware helper functions for Chart.js styling
+    // Theme-aware helper functions for Monochrome Chart.js styling
+    function isDarkTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'dark';
+    }
+
     function getChartGridColor() {
-        return document.documentElement.getAttribute('data-theme') === 'dark' 
-            ? 'rgba(255, 255, 255, 0.06)' 
-            : 'rgba(15, 23, 42, 0.06)';
+        return isDarkTheme() 
+            ? 'rgba(255, 255, 255, 0.05)' 
+            : 'rgba(0, 0, 0, 0.05)';
     }
 
     function getChartTextColor() {
-        return document.documentElement.getAttribute('data-theme') === 'dark' 
-            ? 'rgba(148, 163, 184, 0.8)' 
-            : 'rgba(71, 85, 105, 0.8)';
+        return isDarkTheme() 
+            ? 'rgba(161, 161, 170, 0.9)' 
+            : 'rgba(82, 82, 91, 0.9)';
+    }
+
+    function getPrimaryLineColor() {
+        return isDarkTheme() ? '#fafafa' : '#09090b';
+    }
+
+    function getSecondaryLineColor() {
+        return '#71717a';
     }
 
     // 1. Setup Chart.js Telemetry Monitor
     const ctx = document.getElementById('liveTelemetryChart').getContext('2d');
     
-    // Muted Rose-Red Gradient for Temperature
-    const tempGradient = ctx.createLinearGradient(0, 0, 0, 300);
-    tempGradient.addColorStop(0, 'rgba(225, 29, 72, 0.12)');
-    tempGradient.addColorStop(1, 'rgba(225, 29, 72, 0)');
-    
-    // Primary Indigo-Blue Gradient for Humidity
-    const humGradient = ctx.createLinearGradient(0, 0, 0, 300);
-    humGradient.addColorStop(0, 'rgba(37, 99, 235, 0.12)');
-    humGradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+    function createGradients() {
+        const tempG = ctx.createLinearGradient(0, 0, 0, 300);
+        tempG.addColorStop(0, isDarkTheme() ? 'rgba(250, 250, 250, 0.12)' : 'rgba(9, 9, 11, 0.08)');
+        tempG.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        const humG = ctx.createLinearGradient(0, 0, 0, 300);
+        humG.addColorStop(0, 'rgba(113, 113, 122, 0.08)');
+        humG.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        return { tempG, humG };
+    }
+
+    const { tempG, humG } = createGradients();
     
     // Load initial weather packets from blade loop
     const initialLogs = @json($recentLogs->reverse()->values());
@@ -654,25 +655,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 {
                     label: 'Temperature (°C)',
                     data: tempData,
-                    borderColor: '#e11d48',
-                    backgroundColor: tempGradient,
+                    borderColor: getPrimaryLineColor(),
+                    backgroundColor: tempG,
                     borderWidth: 2,
                     fill: true,
                     tension: 0.35,
-                    pointBackgroundColor: '#e11d48',
-                    pointHoverRadius: 6,
+                    pointBackgroundColor: getPrimaryLineColor(),
+                    pointHoverRadius: 5,
                     yAxisID: 'y'
                 },
                 {
                     label: 'Humidity (%)',
                     data: humData,
-                    borderColor: '#2563eb',
-                    backgroundColor: humGradient,
-                    borderWidth: 2,
+                    borderColor: getSecondaryLineColor(),
+                    borderDash: [4, 4],
+                    backgroundColor: humG,
+                    borderWidth: 1.5,
                     fill: true,
                     tension: 0.35,
-                    pointBackgroundColor: '#2563eb',
-                    pointHoverRadius: 6,
+                    pointBackgroundColor: getSecondaryLineColor(),
+                    pointHoverRadius: 5,
                     yAxisID: 'y1'
                 }
             ]
@@ -684,14 +686,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 legend: {
                     labels: {
                         color: getChartTextColor(),
-                        font: { family: 'Outfit, Inter, sans-serif', size: 12, weight: '500' }
+                        font: { family: 'Inter, sans-serif', size: 12, weight: '500' }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    backgroundColor: isDarkTheme() ? '#18181b' : '#09090b',
                     titleColor: '#fff',
                     bodyColor: '#fff',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: isDarkTheme() ? '#27272a' : '#e4e4e7',
                     borderWidth: 1,
                     cornerRadius: 8,
                     padding: 10
@@ -707,16 +709,16 @@ document.addEventListener("DOMContentLoaded", function() {
                     display: true,
                     position: 'left',
                     grid: { color: getChartGridColor() },
-                    ticks: { color: '#e11d48', font: { size: 10 } },
-                    title: { display: true, text: 'Temperature (°C)', color: '#e11d48' }
+                    ticks: { color: getChartTextColor(), font: { size: 10 } },
+                    title: { display: true, text: 'Temperature (°C)', color: getChartTextColor() }
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
                     grid: { drawOnChartArea: false },
-                    ticks: { color: '#2563eb', font: { size: 10 } },
-                    title: { display: true, text: 'Humidity (%)', color: '#2563eb' }
+                    ticks: { color: getSecondaryLineColor(), font: { size: 10 } },
+                    title: { display: true, text: 'Humidity (%)', color: getSecondaryLineColor() }
                 }
             }
         }
@@ -725,10 +727,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // 1.5 Setup Chart.js Solar Power Monitor
     const solarCtx = document.getElementById('solarRealtimeChart').getContext('2d');
     
-    // Golden-Amber Gradient for Solar Active Power
-    const solarGradient = solarCtx.createLinearGradient(0, 0, 0, 240);
-    solarGradient.addColorStop(0, 'rgba(217, 119, 6, 0.12)');
-    solarGradient.addColorStop(1, 'rgba(217, 119, 6, 0)');
+    function createSolarGradient() {
+        const solarG = solarCtx.createLinearGradient(0, 0, 0, 240);
+        solarG.addColorStop(0, isDarkTheme() ? 'rgba(250, 250, 250, 0.12)' : 'rgba(9, 9, 11, 0.08)');
+        solarG.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        return solarG;
+    }
 
     const initialSolarPoints = @json($todaySolarPoints);
     const solarLabels = [];
@@ -747,13 +751,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 {
                     label: 'Solar Active Power (kW)',
                     data: solarPowerData,
-                    borderColor: '#d97706',
-                    backgroundColor: solarGradient,
+                    borderColor: getPrimaryLineColor(),
+                    backgroundColor: createSolarGradient(),
                     borderWidth: 2,
                     fill: true,
                     tension: 0.35,
-                    pointBackgroundColor: '#d97706',
-                    pointHoverRadius: 6,
+                    pointBackgroundColor: getPrimaryLineColor(),
+                    pointHoverRadius: 5,
                 }
             ]
         },
@@ -764,14 +768,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 legend: {
                     labels: {
                         color: getChartTextColor(),
-                        font: { family: 'Outfit, Inter, sans-serif', size: 12, weight: '500' }
+                        font: { family: 'Inter, sans-serif', size: 12, weight: '500' }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    backgroundColor: isDarkTheme() ? '#18181b' : '#09090b',
                     titleColor: '#fff',
                     bodyColor: '#fff',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: isDarkTheme() ? '#27272a' : '#e4e4e7',
                     borderWidth: 1,
                     cornerRadius: 8,
                     padding: 10,
@@ -793,8 +797,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     min: 0,
                     max: 100,
                     grid: { color: getChartGridColor() },
-                    ticks: { color: '#d97706', font: { size: 10 } },
-                    title: { display: true, text: 'Active Power (kW)', color: '#d97706' }
+                    ticks: { color: getChartTextColor(), font: { size: 10 } },
+                    title: { display: true, text: 'Active Power (kW)', color: getChartTextColor() }
                 }
             }
         }
@@ -806,19 +810,37 @@ document.addEventListener("DOMContentLoaded", function() {
             if (mutation.attributeName === 'data-theme') {
                 const newGridColor = getChartGridColor();
                 const newTextColor = getChartTextColor();
+                const primaryLine = getPrimaryLineColor();
+                const secondaryLine = getSecondaryLineColor();
+                const { tempG, humG } = createGradients();
                 
                 // Redraw live telemetry chart
+                liveChart.data.datasets[0].borderColor = primaryLine;
+                liveChart.data.datasets[0].pointBackgroundColor = primaryLine;
+                liveChart.data.datasets[0].backgroundColor = tempG;
+                liveChart.data.datasets[1].borderColor = secondaryLine;
+                liveChart.data.datasets[1].pointBackgroundColor = secondaryLine;
+                liveChart.data.datasets[1].backgroundColor = humG;
+                
                 liveChart.options.plugins.legend.labels.color = newTextColor;
                 liveChart.options.scales.x.grid.color = newGridColor;
                 liveChart.options.scales.x.ticks.color = newTextColor;
                 liveChart.options.scales.y.grid.color = newGridColor;
+                liveChart.options.scales.y.ticks.color = newTextColor;
+                liveChart.options.scales.y.title.color = newTextColor;
                 liveChart.update();
                 
                 // Redraw live solar chart
+                solarChart.data.datasets[0].borderColor = primaryLine;
+                solarChart.data.datasets[0].pointBackgroundColor = primaryLine;
+                solarChart.data.datasets[0].backgroundColor = createSolarGradient();
+                
                 solarChart.options.plugins.legend.labels.color = newTextColor;
                 solarChart.options.scales.x.grid.color = newGridColor;
                 solarChart.options.scales.x.ticks.color = newTextColor;
                 solarChart.options.scales.y.grid.color = newGridColor;
+                solarChart.options.scales.y.ticks.color = newTextColor;
+                solarChart.options.scales.y.title.color = newTextColor;
                 solarChart.update();
             }
         });
@@ -926,10 +948,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         else if (batVal <= 3.5) batPct = 0;
                         else batPct = Math.round(((batVal - 3.5) / 0.7) * 100);
 
-                        let batColor = 'var(--accent)';
-                        if (batPct < 20) batColor = 'var(--danger)';
-                        else if (batPct < 50) batColor = 'var(--warning)';
-
                         const batLabel = card.querySelector('.dev-battery-label');
                         if (batLabel) batLabel.innerText = `Battery (${batVal.toFixed(2)}V)`;
 
@@ -939,17 +957,16 @@ document.addEventListener("DOMContentLoaded", function() {
                         const batFill = card.querySelector('.dev-battery-fill');
                         if (batFill) {
                             batFill.style.width = `${batPct}%`;
-                            batFill.style.background = batColor;
+                            batFill.style.background = 'var(--text-primary)';
                         }
 
                         // RSSI Signal Strength
                         const rssiVal = parseInt(log.rssi) || 0;
                         let rssiLabel = 'Excellent';
-                        let rssiColor = 'var(--accent)';
                         let rssiPct = 100;
-                        if (rssiVal <= -90) { rssiLabel = 'Critical'; rssiColor = 'var(--danger)'; rssiPct = 15; }
-                        else if (rssiVal <= -80) { rssiLabel = 'Poor'; rssiColor = 'var(--warning)'; rssiPct = 40; }
-                        else if (rssiVal <= -70) { rssiLabel = 'Good'; rssiColor = 'var(--primary)'; rssiPct = 70; }
+                        if (rssiVal <= -90) { rssiLabel = 'Critical'; rssiPct = 15; }
+                        else if (rssiVal <= -80) { rssiLabel = 'Poor'; rssiPct = 40; }
+                        else if (rssiVal <= -70) { rssiLabel = 'Good'; rssiPct = 70; }
 
                         const rssiLabelEl = card.querySelector('.dev-rssi-label');
                         if (rssiLabelEl) rssiLabelEl.innerText = `Signal RSSI (${rssiVal} dBm)`;
@@ -957,29 +974,28 @@ document.addEventListener("DOMContentLoaded", function() {
                         const rssiStatus = card.querySelector('.dev-rssi-status');
                         if (rssiStatus && rssiStatus.innerText !== rssiLabel) {
                             rssiStatus.innerText = rssiLabel;
-                            rssiStatus.style.color = rssiColor;
                         }
 
                         const rssiFill = card.querySelector('.dev-rssi-fill');
                         if (rssiFill) {
                             rssiFill.style.width = `${rssiPct}%`;
-                            rssiFill.style.background = rssiColor;
+                            rssiFill.style.background = 'var(--text-primary)';
                         }
 
                         // Component Statuses
                         const bmeBadge = card.querySelector('.dev-bme-badge');
                         if (bmeBadge) {
                             const expectedBme = log.bme_status 
-                                ? `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`
-                                : `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
+                                ? `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);">OK</span>`
+                                : `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: transparent; border-color: var(--text-muted) !important; color: var(--text-muted); border-style: dashed;">OFFLINE</span>`;
                             if (bmeBadge.innerHTML !== expectedBme) bmeBadge.innerHTML = expectedBme;
                         }
 
                         const dhtBadge = card.querySelector('.dev-dht-badge');
                         if (dhtBadge) {
                             const expectedDht = log.dht_status !== false
-                                ? `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;">OK</span>`
-                                : `<span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; animation: pulse 1.5s infinite;">OFFLINE</span>`;
+                                ? `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);">OK</span>`
+                                : `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: transparent; border-color: var(--text-muted) !important; color: var(--text-muted); border-style: dashed;">OFFLINE</span>`;
                             if (dhtBadge.innerHTML !== expectedDht) dhtBadge.innerHTML = expectedDht;
                         }
 
@@ -987,11 +1003,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (solarBadge) {
                             let expectedSolar = '';
                             if (log.solar_status === 'charging') {
-                                expectedSolar = `<span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>`;
+                                expectedSolar = `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);"><i class="fa-solid fa-bolt me-0.5" style="font-size: 0.5rem;"></i>CHG</span>`;
                             } else if (log.solar_status === 'full') {
-                                expectedSolar = `<span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>`;
+                                expectedSolar = `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: var(--card-bg); border-color: var(--card-border) !important; color: var(--text-primary);"><i class="fa-solid fa-check me-0.5" style="font-size: 0.5rem;"></i>FULL</span>`;
                             } else {
-                                expectedSolar = `<span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px;"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>`;
+                                expectedSolar = `<span class="badge border px-1.5 py-0.5" style="font-size: 0.55rem; border-radius: 4px; background: transparent; border-color: var(--card-border) !important; color: var(--text-muted);"><i class="fa-solid fa-moon me-0.5" style="font-size: 0.5rem;"></i>IDLE</span>`;
                             }
                             if (solarBadge.innerHTML !== expectedSolar) solarBadge.innerHTML = expectedSolar;
                         }
@@ -1014,20 +1030,20 @@ document.addEventListener("DOMContentLoaded", function() {
                         const batStr = log.battery !== null ? log.battery + 'V' : '--';
                         
                         htmlContent += `
-                            <div class="form-control-glass p-3 border-0" style="border-radius: 12px; transition: var(--transition-smooth);">
+                            <div class="form-control-glass p-3 border-0" style="border-radius: 12px; background: var(--sidebar-active); border: 1px solid var(--card-border) !important; transition: var(--transition-smooth);">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="fw-bold small text-primary">${log.device_name}</span>
                                     <span class="text-muted" style="font-size: 0.72rem;">${log.created_at_human}</span>
                                 </div>
                                 <div class="row text-center g-1 text-secondary" style="font-size: 0.8rem;">
                                     <div class="col-4">
-                                        <i class="fa-solid fa-temperature-half me-1 text-danger"></i>${tempStr}
+                                        <i class="fa-solid fa-temperature-half me-1 text-muted"></i>${tempStr}
                                     </div>
                                     <div class="col-4">
-                                        <i class="fa-solid fa-droplet me-1 text-primary"></i>${humStr}
+                                        <i class="fa-solid fa-droplet me-1 text-muted"></i>${humStr}
                                     </div>
                                     <div class="col-4">
-                                        <i class="fa-solid fa-battery-three-quarters me-1 text-success"></i>${batStr}
+                                        <i class="fa-solid fa-battery-three-quarters me-1 text-muted"></i>${batStr}
                                     </div>
                                 </div>
                             </div>

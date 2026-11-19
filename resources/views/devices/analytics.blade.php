@@ -33,6 +33,8 @@
            class="btn btn-sm py-1.5 px-3 {{ $range === '7d' ? 'btn-premium-primary' : 'btn-premium-secondary' }}" style="border-radius: 8px;">Last 7 Days</a>
         <a href="{{ route('devices.analytics', ['id' => $device->id, 'range' => '30d']) }}" 
            class="btn btn-sm py-1.5 px-3 {{ $range === '30d' ? 'btn-premium-primary' : 'btn-premium-secondary' }}" style="border-radius: 8px;">Last 30 Days</a>
+        <a href="{{ route('devices.analytics', ['id' => $device->id, 'range' => '1y']) }}" 
+           class="btn btn-sm py-1.5 px-3 {{ $range === '1y' ? 'btn-premium-primary' : 'btn-premium-secondary' }}" style="border-radius: 8px;">Last 1 Year</a>
     </div>
 </div>
 

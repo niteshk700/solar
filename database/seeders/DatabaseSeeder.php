@@ -24,15 +24,19 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Create IoT Devices (Clean registration with no mock history)
+        // 2. Create IoT Devices
         \App\Models\Device::updateOrCreate(
             ['device_id' => 'solar_data_collector_v1'],
             [
                 'api_key' => 'SolarDataCollectionV1',
                 'device_name' => 'Solar Data Collector v1',
                 'status' => 'active',
-                'last_seen' => null,
+                'last_seen' => now('Asia/Kolkata'),
             ]
         );
+
+        // 3. Seed 1-Year Realistic Diurnal Solar & Weather Telemetry
+        $generator = new \App\Services\SolarTelemetryGeneratorService();
+        $generator->seedHistoricalYear('solar_data_collector_v1', 365, 30);
     }
 }

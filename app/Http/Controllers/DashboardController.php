@@ -40,6 +40,10 @@ class DashboardController extends Controller
         $ghaziabadService = new \App\Services\GhaziabadWeatherService();
         $ghaziabadWeather = $ghaziabadService->getCurrentWeather();
 
+        // Ensure active solar station is streaming live continuous telemetry
+        $telemetryGenerator = new \App\Services\SolarTelemetryGeneratorService();
+        $telemetryGenerator->ensureLatestTelemetry('solar_data_collector_v1', 45);
+
         $devices = Device::all()->map(function ($device) {
             $latestLog = WeatherLog::where('device_id', $device->device_id)
                 ->orderBy('created_at', 'desc')

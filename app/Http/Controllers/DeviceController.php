@@ -99,6 +99,12 @@ class DeviceController extends Controller
                 $format = 'Y-m-d H:i';
                 $grouping = 4; // Fetch fewer points for large range
                 break;
+            case '1y':
+            case '365d':
+                $hours = 24 * 365;
+                $format = 'M d, Y';
+                $grouping = 48; // 1 sample per day average for fast smooth render
+                break;
             case '30d':
                 $hours = 24 * 30;
                 $format = 'Y-m-d';

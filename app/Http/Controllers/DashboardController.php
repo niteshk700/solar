@@ -22,8 +22,12 @@ class DashboardController extends Controller
     /**
      * AJAX Polling Endpoint: Return live JSON data of all nodes & metrics.
      */
-    public function liveData(): JsonResponse
+    public function liveData(Request $request): JsonResponse
     {
+        if ($request->boolean('refresh')) {
+            (new \App\Services\GhaziabadWeatherService())->refresh();
+        }
+
         $data = $this->getDashboardStats();
         return response()->json($data);
     }
@@ -33,6 +37,9 @@ class DashboardController extends Controller
      */
     private function getDashboardStats(): array
     {
+        $ghaziabadService = new \App\Services\GhaziabadWeatherService();
+        $ghaziabadWeather = $ghaziabadService->getCurrentWeather();
+
         $devices = Device::all()->map(function ($device) {
             $latestLog = WeatherLog::where('device_id', $device->device_id)
                 ->orderBy('created_at', 'desc')
@@ -87,10 +94,11 @@ class DashboardController extends Controller
             'online_devices' => $devices->filter(fn($d) => $d->is_online)->count(),
             'offline_devices' => $devices->filter(fn($d) => !$d->is_online && $d->status === 'active')->count(),
             'inactive_devices' => $devices->filter(fn($d) => $d->status === 'inactive')->count(),
-            'avg_temp' => $logCount > 0 ? round($avgTemp / $logCount, 1) : null,
-            'avg_hum' => $logCount > 0 ? round($avgHum / $logCount, 1) : null,
-            'avg_press' => $logCount > 0 ? round($avgPress / $logCount, 1) : null,
+            'avg_temp' => $logCount > 0 ? round($avgTemp / $logCount, 1) : ($ghaziabadWeather['temperature'] ?? null),
+            'avg_hum' => $logCount > 0 ? round($avgHum / $logCount, 1) : ($ghaziabadWeather['humidity'] ?? null),
+            'avg_press' => $logCount > 0 ? round($avgPress / $logCount, 1) : ($ghaziabadWeather['pressure'] ?? null),
             'avg_battery' => $logCount > 0 ? round($avgBattery / $logCount, 2) : null,
+            'is_ambient_fallback' => $logCount === 0,
         ];
 
         // Fetch recent weather stream (latest 10 data packets received globally)
@@ -108,7 +116,7 @@ class DashboardController extends Controller
         $solarStats = $solarService->getLiveStats(now('Asia/Kolkata'));
         $todaySolarPoints = $solarService->getDailyPoints(now('Asia/Kolkata'), now('Asia/Kolkata'));
 
-        return compact('devices', 'stats', 'recentLogs', 'solarStats', 'todaySolarPoints');
+        return compact('devices', 'stats', 'recentLogs', 'solarStats', 'todaySolarPoints', 'ghaziabadWeather');
     }
 
     /**

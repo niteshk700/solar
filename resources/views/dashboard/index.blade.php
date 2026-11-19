@@ -172,6 +172,76 @@
     </div>
 </div>
 
+<!-- Live Ghaziabad Ambient Meteorological Feed (Free Open-Meteo API) -->
+<div class="glass-card p-3 p-md-4 mb-4" style="border: 1px solid var(--card-border) !important; border-left: 4px solid #0ea5e9 !important;">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div style="background: rgba(14, 165, 233, 0.12); width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(14, 165, 233, 0.25);">
+                <i id="gz-weather-icon" class="{{ $ghaziabadWeather['icon'] ?? 'fa-solid fa-cloud-sun' }}" style="font-size: 1.5rem; color: {{ $ghaziabadWeather['icon_color'] ?? '#0ea5e9' }};"></i>
+            </div>
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <h3 class="h6 font-heading fw-bold m-0 text-primary d-flex align-items-center gap-1.5">
+                        <i class="fa-solid fa-location-dot" style="color: #ef4444;"></i>
+                        <span>Ghaziabad, Uttar Pradesh</span>
+                    </h3>
+                    <span class="badge px-2.5 py-0.5 small" id="gz-source-badge" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.25); color: #0284c7; border-radius: 9999px; font-size: 0.65rem; font-weight: 600;">
+                        <span class="pulse-cyan me-1" style="width: 5px; height: 5px;"></span>OPEN-METEO LIVE
+                    </span>
+                </div>
+                <div class="text-secondary small mt-0.5" style="font-size: 0.78rem;">
+                    <span id="gz-condition" class="fw-semibold text-primary">{{ $ghaziabadWeather['condition'] ?? 'Clear Sky' }}</span>
+                    &bull; <span class="font-monospace text-muted">{{ $ghaziabadWeather['coordinates'] ?? '28.6692° N, 77.4538° E' }}</span>
+                    &bull; Synced: <span id="gz-updated-at" class="text-muted">{{ $ghaziabadWeather['last_updated'] ?? 'Just now' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4">
+            <!-- Ghaziabad Temp -->
+            <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 rounded-3" style="background: var(--sidebar-active); border: 1px solid var(--card-border);">
+                <div style="background: rgba(244, 63, 94, 0.12); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-temperature-half" style="color: #f43f5e; font-size: 0.95rem;"></i>
+                </div>
+                <div>
+                    <div class="text-muted small" style="font-size: 0.65rem; line-height: 1;">TEMP</div>
+                    <div class="fw-bold text-primary" style="font-size: 0.98rem;" id="gz-temp">{{ isset($ghaziabadWeather['temperature']) ? $ghaziabadWeather['temperature'] . '°C' : '--' }}</div>
+                </div>
+            </div>
+            <!-- Ghaziabad Humidity -->
+            <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 rounded-3" style="background: var(--sidebar-active); border: 1px solid var(--card-border);">
+                <div style="background: rgba(14, 165, 233, 0.12); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-droplet" style="color: #0ea5e9; font-size: 0.95rem;"></i>
+                </div>
+                <div>
+                    <div class="text-muted small" style="font-size: 0.65rem; line-height: 1;">HUMIDITY</div>
+                    <div class="fw-bold text-primary" style="font-size: 0.98rem;" id="gz-hum">{{ isset($ghaziabadWeather['humidity']) ? $ghaziabadWeather['humidity'] . '%' : '--' }}</div>
+                </div>
+            </div>
+            <!-- Ghaziabad Pressure -->
+            <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 rounded-3" style="background: var(--sidebar-active); border: 1px solid var(--card-border);">
+                <div style="background: rgba(139, 92, 246, 0.12); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-gauge-high" style="color: #8b5cf6; font-size: 0.95rem;"></i>
+                </div>
+                <div>
+                    <div class="text-muted small" style="font-size: 0.65rem; line-height: 1;">PRESSURE</div>
+                    <div class="fw-bold text-primary" style="font-size: 0.98rem;" id="gz-press">{{ isset($ghaziabadWeather['pressure']) ? $ghaziabadWeather['pressure'] . ' hPa' : '--' }}</div>
+                </div>
+            </div>
+            <!-- Ghaziabad Wind -->
+            <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 rounded-3" style="background: var(--sidebar-active); border: 1px solid var(--card-border);">
+                <div style="background: rgba(16, 185, 129, 0.12); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-wind" style="color: #10b981; font-size: 0.95rem;"></i>
+                </div>
+                <div>
+                    <div class="text-muted small" style="font-size: 0.65rem; line-height: 1;">WIND SPEED</div>
+                    <div class="fw-bold text-primary" style="font-size: 0.98rem;" id="gz-wind">{{ isset($ghaziabadWeather['wind_speed']) ? $ghaziabadWeather['wind_speed'] . ' km/h' : '--' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Aggregated Metrics Grid with Colorful Accents -->
 <div class="stats-grid">
     <!-- Temp Card (Warm Coral) -->
@@ -179,7 +249,7 @@
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Temperature</span>
             <div class="stat-card-value" style="color: #f43f5e;" id="avg-temp">{{ isset($stats['avg_temp']) ? $stats['avg_temp'] . '°C' : '--' }}</div>
-            <span class="text-muted small">Across active nodes</span>
+            <span class="text-muted small" id="temp-source-caption">{{ !empty($stats['is_ambient_fallback']) ? 'Live Ghaziabad ambient feed' : 'Across active nodes' }}</span>
         </div>
         <div class="stat-icon" style="background: rgba(244, 63, 94, 0.12); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.25);">
             <i class="fa-solid fa-temperature-half" style="font-size: 1.3rem;"></i>
@@ -191,7 +261,7 @@
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Humidity</span>
             <div class="stat-card-value" style="color: #0ea5e9;" id="avg-hum">{{ isset($stats['avg_hum']) ? $stats['avg_hum'] . '%' : '--' }}</div>
-            <span class="text-muted small">Relative air moisture</span>
+            <span class="text-muted small" id="hum-source-caption">{{ !empty($stats['is_ambient_fallback']) ? 'Live Ghaziabad ambient feed' : 'Relative air moisture' }}</span>
         </div>
         <div class="stat-icon" style="background: rgba(14, 165, 233, 0.12); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.25);">
             <i class="fa-solid fa-droplet" style="font-size: 1.3rem;"></i>
@@ -203,7 +273,7 @@
         <div>
             <span class="text-secondary small fw-semibold uppercase tracking-wider">Avg Air Pressure</span>
             <div class="stat-card-value" style="color: #8b5cf6;" id="avg-press">{{ isset($stats['avg_press']) ? $stats['avg_press'] . ' hPa' : '--' }}</div>
-            <span class="text-muted small">Sea-level adjusted</span>
+            <span class="text-muted small" id="press-source-caption">{{ !empty($stats['is_ambient_fallback']) ? 'Live Ghaziabad ambient feed' : 'Sea-level adjusted' }}</span>
         </div>
         <div class="stat-icon" style="background: rgba(139, 92, 246, 0.12); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.25);">
             <i class="fa-solid fa-gauge-high" style="font-size: 1.3rem;"></i>
@@ -852,11 +922,37 @@ document.addEventListener("DOMContentLoaded", function() {
     themeObserver.observe(document.documentElement, { attributes: true });
 
     // 2. Main Live Data Polling Engine
-    function fetchLiveData() {
-        fetch(liveUrl)
+    function fetchLiveData(forceRefresh = false) {
+        const query = forceRefresh ? '?refresh=1' : '';
+        fetch(liveUrl + query)
             .then(response => response.json())
             .then(data => {
                 const stats = data.stats;
+
+                // Update Ghaziabad ambient weather widget
+                if (data.ghaziabadWeather) {
+                    const gz = data.ghaziabadWeather;
+                    updateAnimatedValue(document.getElementById('gz-temp'), gz.temperature !== null ? gz.temperature + '°C' : '--');
+                    updateAnimatedValue(document.getElementById('gz-hum'), gz.humidity !== null ? gz.humidity + '%' : '--');
+                    updateAnimatedValue(document.getElementById('gz-press'), gz.pressure !== null ? gz.pressure + ' hPa' : '--');
+                    updateAnimatedValue(document.getElementById('gz-wind'), gz.wind_speed !== null ? gz.wind_speed + ' km/h' : '--');
+                    updateAnimatedValue(document.getElementById('gz-condition'), gz.condition || 'Clear Sky');
+                    updateAnimatedValue(document.getElementById('gz-updated-at'), gz.last_updated || 'Just now');
+
+                    const gzIcon = document.getElementById('gz-weather-icon');
+                    if (gzIcon && gz.icon) {
+                        gzIcon.className = gz.icon;
+                        if (gz.icon_color) gzIcon.style.color = gz.icon_color;
+                    }
+                }
+
+                // Update metric captions (node vs ambient fallback)
+                const tempCap = document.getElementById('temp-source-caption');
+                if (tempCap) tempCap.innerText = stats.is_ambient_fallback ? 'Live Ghaziabad ambient feed' : 'Across active nodes';
+                const humCap = document.getElementById('hum-source-caption');
+                if (humCap) humCap.innerText = stats.is_ambient_fallback ? 'Live Ghaziabad ambient feed' : 'Relative air moisture';
+                const pressCap = document.getElementById('press-source-caption');
+                if (pressCap) pressCap.innerText = stats.is_ambient_fallback ? 'Live Ghaziabad ambient feed' : 'Sea-level adjusted';
                 
                 // Update overall aggregated metrics
                 updateAnimatedValue(document.getElementById('avg-temp'), stats.avg_temp !== null ? stats.avg_temp + '°C' : '--');
@@ -1104,7 +1200,7 @@ document.addEventListener("DOMContentLoaded", function() {
             forceSyncBtn.disabled = true;
             forceSyncBtn.querySelector('span').innerText = 'Syncing...';
             
-            fetchLiveData();
+            fetchLiveData(true);
             
             setTimeout(() => {
                 syncIcon.classList.remove('fa-spin');

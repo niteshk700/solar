@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SolarMLController;
 
 // 1. Guest Routes (Authentication)
 Route::middleware('guest')->group(function () {
@@ -37,4 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
     Route::post('/settings/tokens', [SettingsController::class, 'generateApiToken'])->name('settings.tokens.generate');
     Route::delete('/settings/tokens/{id}', [SettingsController::class, 'deleteApiToken'])->name('settings.tokens.delete');
+
+    // Solar AI & Machine Learning Forecasting Lab
+    Route::get('/solar-ai', [SolarMLController::class, 'index'])->name('solar.ai');
+    Route::post('/solar-ai/train', [SolarMLController::class, 'train'])->name('solar.ai.train');
+    Route::get('/solar-ai/export-data', [SolarMLController::class, 'exportData'])->name('solar.ai.export');
 });

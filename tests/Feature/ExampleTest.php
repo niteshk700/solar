@@ -52,4 +52,39 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_solar_ai_page_returns_successful_response_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+
+        // Seed plant data
+        $this->seed(\Database\Seeders\SolarGenerationRecordSeeder::class);
+
+        $response = $this->actingAs($user)->get('/solar-ai');
+
+        $response->assertStatus(200);
+        $response->assertSee('Solar AI &amp; Machine Learning Studio', false);
+    }
+
+    public function test_solar_ai_train_endpoint_returns_json_metrics(): void
+    {
+        $user = User::factory()->create();
+        $this->seed(\Database\Seeders\SolarGenerationRecordSeeder::class);
+
+        $response = $this->actingAs($user)->postJson('/solar-ai/train', [
+            'algorithm' => 'random_forest',
+            'estimators' => 50,
+            'tree_depth' => 8,
+            'split_ratio' => 0.8,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'algorithm',
+            'metrics' => ['r2', 'rmse', 'mae', 'mape', 'train_time_ms'],
+            'future_forecast',
+            'benchmark'
+        ]);
+    }
 }

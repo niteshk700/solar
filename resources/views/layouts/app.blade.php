@@ -143,6 +143,11 @@
                             <i class="fa-solid fa-microchip"></i>
                             <span>Devices</span>
                         </a>
+                        <a href="{{ route('solar.ai') }}" class="nav-link-custom {{ Route::is('solar.ai') ? 'active' : '' }}">
+                            <i class="fa-solid fa-brain" style="color: #a855f7;"></i>
+                            <span>Solar AI Lab</span>
+                            <span class="badge rounded-pill text-uppercase" style="font-size: 0.6rem; background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3);">ML</span>
+                        </a>
                         <a href="{{ route('settings.index') }}" class="nav-link-custom {{ Route::is('settings.index') ? 'active' : '' }}">
                             <i class="fa-solid fa-sliders"></i>
                             <span>Settings</span>

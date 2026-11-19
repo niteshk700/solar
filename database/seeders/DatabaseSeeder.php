@@ -38,5 +38,8 @@ class DatabaseSeeder extends Seeder
         // 3. Seed 1-Year Realistic Diurnal Solar & Weather Telemetry
         $generator = new \App\Services\SolarTelemetryGeneratorService();
         $generator->seedHistoricalYear('solar_data_collector_v1', 365, 30);
+
+        // 4. Ingest Historical 99.84 kW Solar Plant Records (1,334 Days)
+        $this->call(SolarGenerationRecordSeeder::class);
     }
 }

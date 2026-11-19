@@ -165,6 +165,10 @@
             <i class="fa-solid fa-solar-panel" style="color: #f59e0b;"></i>
             <span>Solar Logs</span>
         </a>
+        <a href="{{ route('solar.ai') }}" class="btn btn-premium-secondary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 9px 16px; border-color: rgba(168, 85, 247, 0.4);">
+            <i class="fa-solid fa-brain" style="color: #a855f7;"></i>
+            <span>AI Forecast Lab</span>
+        </a>
         <a href="{{ route('devices.index') }}" class="btn btn-premium-primary d-flex align-items-center gap-2" style="border-radius: 10px; padding: 9px 16px;">
             <i class="fa-solid fa-plus"></i>
             <span>Manage Devices</span>
